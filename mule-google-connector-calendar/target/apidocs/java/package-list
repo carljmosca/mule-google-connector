@@ -1,0 +1,15 @@
+com.github.mule.google.calendar.connector
+com.github.mule.google.calendar.connector.adapter
+com.github.mule.google.calendar.connector.adapters
+com.github.mule.google.calendar.connector.agents
+com.github.mule.google.calendar.connector.basic
+com.github.mule.google.calendar.connector.callback
+com.github.mule.google.calendar.connector.config
+com.github.mule.google.calendar.connector.connection
+com.github.mule.google.calendar.connector.connectivity
+com.github.mule.google.calendar.connector.devkit
+com.github.mule.google.calendar.connector.oauth
+com.github.mule.google.calendar.connector.process
+com.github.mule.google.calendar.connector.processors
+com.github.mule.google.calendar.connector.transformers
+
