@@ -9,6 +9,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
+import org.apache.log4j.Logger;
+
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
@@ -30,7 +32,9 @@ import com.google.api.services.calendar.model.EventDateTime;
 import com.google.api.services.calendar.model.Events;
 
 public class CalendarManager {
+	
 
+	private static Logger LOGGER = Logger.getLogger(CalendarManager.class);
 	private static com.google.api.services.calendar.Calendar client;
 	private static final JsonFactory JSON_FACTORY = JacksonFactory
 			.getDefaultInstance();
@@ -57,7 +61,7 @@ public class CalendarManager {
 					.setApplicationName(APPLICATION_NAME).build();
 
 		} catch (IOException e) {
-			System.err.println(e.getMessage());
+			LOGGER.error(e);
 		} catch (Throwable t) {
 			t.printStackTrace();
 		}
@@ -74,6 +78,7 @@ public class CalendarManager {
 				addEvent(calendar, startDate, endDate, timeZone, summary, description, location, guestList);
 			}
 		} catch (IOException e) {
+			LOGGER.error(e);
 			result = e.getMessage();
 		}
 		return result;
@@ -85,6 +90,7 @@ public class CalendarManager {
 			Calendar calendar = addCalendar(calendarSummary);
 			calendarId = calendar.getId();
 		} catch (IOException e) {
+			LOGGER.error(e);
 		}
 		return calendarId;
 	}
@@ -94,6 +100,7 @@ public class CalendarManager {
 		try {
 			client.calendars().delete(calendarId).execute();
 		} catch (IOException e) {
+			LOGGER.error(e);
 			return false;
 		}
 		return result;
@@ -105,6 +112,7 @@ public class CalendarManager {
 			Calendar calendar = getCalendar(calendarId);
 			found = calendar != null;
 		} catch (IOException e) {
+			LOGGER.error(e);
 		}
 		return found;
 	}
@@ -139,7 +147,6 @@ public class CalendarManager {
 				if (calendarListEntry.getSummary().equals(summary)) {
 					return calendarListEntry.getId();
 				}
-				System.out.println(calendarListEntry.getSummary());
 			}
 			pageToken = calendarList.getNextPageToken();
 		} while (pageToken != null);
@@ -156,6 +163,7 @@ public class CalendarManager {
 				events = client.events().list(calendarId)
 						.setPageToken(pageToken).execute();
 			} catch (IOException e) {
+				LOGGER.error(e);
 			}
 			List<Event> items = events.getItems();
 			for (Event event : items) {
@@ -194,8 +202,7 @@ public class CalendarManager {
 			event.setAttendees(attendees);
 		}
 		Event result = client.events().insert(calendar.getId(), event).setSendNotifications(sendNotificaitons)
-				.execute();
-		
+				.execute();		
 		return result;
 	}
 
