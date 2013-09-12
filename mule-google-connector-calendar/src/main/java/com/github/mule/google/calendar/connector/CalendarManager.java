@@ -3,8 +3,6 @@ package com.github.mule.google.calendar.connector;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -13,6 +11,7 @@ import java.util.TimeZone;
 
 import org.apache.log4j.Logger;
 
+import com.github.mule.google.calendar.connector.utility.Utility;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
@@ -240,7 +239,7 @@ public class CalendarManager {
 	private static Event addEvent(Calendar calendar, String startDate,
 			String endDate, TimeZone timeZone, String summary, String description, String location,
 			List<String> guestList) throws IOException {
-		Event event = newEvent(stringToDate(startDate), stringToDate(endDate), timeZone);
+		Event event = newEvent(Utility.stringToDate(startDate), Utility.stringToDate(endDate), timeZone);
 		event.setSummary(summary);
 		event.setDescription(description);
 		event.setLocation(location);
@@ -292,22 +291,6 @@ public class CalendarManager {
 		return event;
 	}
 	
-	private static Date stringToDate(String value) {
-		Date date = null;
-		String[] simpleDateFormats = {"yyyy-MM-dd hh:mm:ss a", "yyyy-M-d hh:mma", "yyyy-MM-dd HH:mm:ss", "MM/dd/yy hh:mm:ss a", "MM/dd/yy hh:mm:ssa",
-				"MM/dd/yyyy hh:mm:ss a", "MM/dd/yyyy HH:mm:ss"};
-		for (String s : simpleDateFormats) {
-			SimpleDateFormat sdf = new SimpleDateFormat(s);
-			try {
-				date = sdf.parse(value);
-				return date;
-			} catch (ParseException e) {
-			}
-		}
-		LOGGER.error("Unsupported date format: " + value);
-		return date;
-	}
-
 	/**
 	 * Authorizes the installed application to access user's protected data.
 	 */
