@@ -129,7 +129,7 @@ public class CalendarManager {
 	public boolean clearCalendar(String calendarId) {
 		boolean result = false;
 		try {
-			client.calendars().clear(calendarId);
+			client.calendars().clear(calendarId).execute();
 			result = true;
 		} catch (IOException e) {
 			LOGGER.error(e);

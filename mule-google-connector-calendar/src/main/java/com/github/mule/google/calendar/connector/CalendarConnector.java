@@ -98,7 +98,7 @@ public class CalendarConnector {
 	}
 	
 	/**
-	 * createEvent processor
+	 * updateEvent processor
 	 * 
 	 * {@sample.xml ../../../doc/Calendar-connector.xml.sample google-calendar:update-event}
 	 * 
