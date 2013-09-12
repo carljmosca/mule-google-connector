@@ -85,6 +85,24 @@ public class CalendarManager {
 		}
 		return result;
 	}
+	
+	public String updateEvent(String calendarId, String eventId, String startDate, String endDate,
+			TimeZone timeZone, String summary, String description, String location,
+			List<String> guestList) {
+		String result = "";
+		Calendar calendar = null;
+		Event event = null;
+		try {
+			calendar = getCalendar(calendarId);
+			if (calendar != null) {
+				updateEvent(calendar, event, startDate, endDate, timeZone, summary, description, location, guestList);
+			}
+		} catch (IOException e) {
+			LOGGER.error(e);
+			result = e.getMessage();
+		}
+		return result;
+	}
 
 	public String createCalendar(String calendarSummary) {
 		String calendarId = "";
@@ -101,10 +119,21 @@ public class CalendarManager {
 		boolean result = false;
 		try {
 			client.calendars().delete(calendarId).execute();
+			result = true;
 		} catch (IOException e) {
 			LOGGER.error(e);
-			return false;
 		}
+		return result;
+	}
+	
+	public boolean clearCalendar(String calendarId) {
+		boolean result = false;
+		try {
+			client.calendars().clear(calendarId);
+			result = true;
+		} catch (IOException e) {
+			LOGGER.error(e);
+		}		
 		return result;
 	}
 	
@@ -204,7 +233,29 @@ public class CalendarManager {
 			event.setAttendees(attendees);
 		}
 		Event result = client.events().insert(calendar.getId(), event).setSendNotifications(sendNotificaitons)
-				.execute();		
+				.execute();	
+		return result;
+	}
+	
+	private static Event updateEvent(Calendar calendar, Event event, String startDate,
+			String endDate, TimeZone timeZone, String summary, String description, String location,
+			List<String> guestList) throws IOException {
+		event.setSummary(summary);
+		event.setDescription(description);
+		event.setLocation(location);
+		boolean sendNotificaitons = false;
+		if (guestList != null && !guestList.isEmpty()) {
+			List<EventAttendee> attendees = new ArrayList<EventAttendee>(0);
+			for (String email : guestList) {
+				EventAttendee ea = new EventAttendee();
+				ea.setEmail(email);
+				attendees.add(ea);
+				sendNotificaitons = true;
+			}
+			event.setAttendees(attendees);
+		}
+		Event result = client.events().insert(calendar.getId(), event).setSendNotifications(sendNotificaitons)
+				.execute();	
 		return result;
 	}
 
@@ -240,10 +291,6 @@ public class CalendarManager {
 	private static Credential authorize() throws Exception {
 		// load client secrets
 		GoogleAuthorizationCodeFlow flow = null;
-//		GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(
-//				JSON_FACTORY,
-//				new InputStreamReader(CalendarManager.class
-//						.getResourceAsStream("/client_secrets.json")));
 		FileInputStream CLIENT_SECRETS_FILE = new FileInputStream(System.getProperty("user.home") + "/.store/client_secrets.json");
 		GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(
 				JSON_FACTORY,

@@ -1,6 +1,5 @@
 package com.github.mule.google.calendar.connector;
 
-import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -65,7 +64,6 @@ public class CalendarConnector {
 		return "001";
 	}
 
-
 	/**
 	 * createEvent processor
 	 * 
@@ -100,6 +98,41 @@ public class CalendarConnector {
 	}
 	
 	/**
+	 * createEvent processor
+	 * 
+	 * {@sample.xml ../../../doc/Calendar-connector.xml.sample google-calendar:update-event}
+	 * 
+	 * @param calendarId
+	 *            id of calendar to be processed
+	 * @param eventId
+	 * 			  id of event to be processed
+	 * @param startDate
+	 *            start date/time of event
+	 * @param endDate
+	 *            end date/time of event
+	 * @param timeZone
+	 * 			  timeZone of event
+	 * @param summary
+	 * 			  summary of event
+	 * @param description
+	 *            description of event
+	 * @param location
+	 * 			  location of event
+	 * @param guestList
+	 * 			  list of guests to invite           
+	 * @return string
+	 * */
+	@Processor
+	public String updateEvent(String calendarId, String eventId, String startDate,
+			String endDate, String timeZone, String summary, String description,
+			String location, List<String> guestList) {
+		CalendarManager manager = new CalendarManager();
+		TimeZone tz = TimeZone.getTimeZone(timeZone);
+		return manager.createEvent(calendarId, startDate, endDate, tz,
+				summary, description, location, guestList);
+	}	
+	
+	/**
 	 * createCalendar processor
 	 * 
 	 * {@sample.xml ../../../doc/Calendar-connector.xml.sample google-calendar:create-calendar}
@@ -128,6 +161,21 @@ public class CalendarConnector {
 		CalendarManager manager = new CalendarManager();
 		return manager.findCalendar(summary);
 	}
+	
+	/**
+	 * clearCalendar processor
+	 * 
+	 * {@sample.xml ../../../doc/Calendar-connector.xml.sample google-calendar:clear-calendar}
+	 * 
+	 * @param calendarId
+	 * 				calendarId of calendar
+	 * @return boolean
+	 * */
+	@Processor
+	public Boolean clearCalendar(String calendarId) {
+		CalendarManager manager = new CalendarManager();
+		return manager.clearCalendar(calendarId);
+	}	
 	
 	/**
 	 * deleteCalendar processor
