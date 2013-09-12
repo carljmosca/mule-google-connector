@@ -220,7 +220,7 @@ public class CalendarManager {
 	
 	private static Date stringToDate(String value) {
 		Date date = null;
-		String[] simpleDateFormats = {"yyyy-MM-dd hh:mm:ss a", "yyyy-MM-dd HH:mm:ss", "MM/dd/yy hh:mm:ss a",
+		String[] simpleDateFormats = {"yyyy-MM-dd hh:mm:ss a", "yyyy-M-d hh:mma", "yyyy-MM-dd HH:mm:ss", "MM/dd/yy hh:mm:ss a", "MM/dd/yy hh:mm:ssa",
 				"MM/dd/yyyy hh:mm:ss a", "MM/dd/yyyy HH:mm:ss"};
 		for (String s : simpleDateFormats) {
 			SimpleDateFormat sdf = new SimpleDateFormat(s);
@@ -230,6 +230,7 @@ public class CalendarManager {
 			} catch (ParseException e) {
 			}
 		}
+		LOGGER.error("Unsupported date format: " + value);
 		return date;
 	}
 
