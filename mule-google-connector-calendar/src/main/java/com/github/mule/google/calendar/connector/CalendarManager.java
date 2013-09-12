@@ -129,11 +129,34 @@ public class CalendarManager {
 	public boolean clearCalendar(String calendarId) {
 		boolean result = false;
 		try {
-			client.calendars().clear(calendarId).execute();
+			List<Event> events = getCalendarEvents(calendarId);
+			for (Event event : events) {
+				client.events().delete(calendarId, event.getId()).execute();
+			}
 			result = true;
 		} catch (IOException e) {
 			LOGGER.error(e);
 		}		
+		return result;
+	}
+	
+	private List<Event> getCalendarEvents(String calendarId) {
+		List<Event> result = new ArrayList<Event>(0);
+		String pageToken = null;
+		do {
+			Events events = null;
+			try {
+				events = client.events().list(calendarId)
+						.setPageToken(pageToken).execute();
+			} catch (IOException e) {
+				LOGGER.error(e);
+			}
+			List<Event> items = events.getItems();
+			for (Event event : items) {
+				result.add(event);
+			}
+			pageToken = events.getNextPageToken();
+		} while (pageToken != null);
 		return result;
 	}
 	

@@ -42,14 +42,14 @@ public class CalendarManagerTest {
 		assertTrue(completed);
 	}
 	
-//	@Test
-//	public void testClearCalendar() {
-//		boolean completed = false;
-//		CalendarManager calendarManager = new CalendarManager();
-//		String calendarId = calendarManager.findCalendar("Test Calendar");
-//		completed = calendarManager.clearCalendar(calendarId);
-//		assertTrue(completed);
-//	}
+	@Test
+	public void testClearCalendar() {
+		boolean completed = false;
+		CalendarManager calendarManager = new CalendarManager();
+		String calendarId = calendarManager.findCalendar("Test Calendar");
+		completed = calendarManager.clearCalendar(calendarId);
+		assertTrue(completed);
+	}
 
 	@Test
 	public void testCreateCalendar() {
