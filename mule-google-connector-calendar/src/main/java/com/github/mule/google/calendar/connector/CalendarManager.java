@@ -3,6 +3,8 @@ package com.github.mule.google.calendar.connector;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -67,7 +69,7 @@ public class CalendarManager {
 		}
 	}
 
-	public String createEvent(String calendarId, Date startDate, Date endDate,
+	public String createEvent(String calendarId, String startDate, String endDate,
 			TimeZone timeZone, String summary, String description, String location,
 			List<String> guestList) {
 		String result = "";
@@ -183,10 +185,10 @@ public class CalendarManager {
 		return result;
 	}
 	
-	private static Event addEvent(Calendar calendar, Date startDate,
-			Date endDate, TimeZone timeZone, String summary, String description, String location,
+	private static Event addEvent(Calendar calendar, String startDate,
+			String endDate, TimeZone timeZone, String summary, String description, String location,
 			List<String> guestList) throws IOException {
-		Event event = newEvent(startDate, endDate, timeZone);
+		Event event = newEvent(stringToDate(startDate), stringToDate(endDate), timeZone);
 		event.setSummary(summary);
 		event.setDescription(description);
 		event.setLocation(location);
@@ -214,6 +216,21 @@ public class CalendarManager {
 		DateTime end = new DateTime(endDate, timeZone);
 		event.setEnd(new EventDateTime().setDateTime(end));
 		return event;
+	}
+	
+	private static Date stringToDate(String value) {
+		Date date = null;
+		String[] simpleDateFormats = {"yyyy-MM-dd hh:mm:ss a", "yyyy-MM-dd HH:mm:ss", "MM/dd/yy hh:mm:ss a",
+				"MM/dd/yyyy hh:mm:ss a", "MM/dd/yyyy HH:mm:ss"};
+		for (String s : simpleDateFormats) {
+			SimpleDateFormat sdf = new SimpleDateFormat(s);
+			try {
+				date = sdf.parse(value);
+				return date;
+			} catch (ParseException e) {
+			}
+		}
+		return date;
 	}
 
 	/**

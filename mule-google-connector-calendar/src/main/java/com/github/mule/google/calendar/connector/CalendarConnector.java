@@ -90,8 +90,8 @@ public class CalendarConnector {
 	 * @return string
 	 * */
 	@Processor
-	public String createEvent(String calendarId, Date startDate,
-			Date endDate, String timeZone, String summary, String description,
+	public String createEvent(String calendarId, String startDate,
+			String endDate, String timeZone, String summary, String description,
 			String location, List<String> guestList) {
 		CalendarManager manager = new CalendarManager();
 		TimeZone tz = TimeZone.getTimeZone(timeZone);

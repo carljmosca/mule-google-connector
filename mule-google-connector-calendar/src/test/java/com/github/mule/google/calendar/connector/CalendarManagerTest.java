@@ -25,10 +25,8 @@ public class CalendarManagerTest {
 		String calendarId = calendarManager.createCalendar("Test Calendar");
 		if (calendarManager.calendarExists(calendarId)) {
 			try {
-				SimpleDateFormat sdf = new SimpleDateFormat(
-						"yyyy-MM-dd hh:mm:ss a");
-				Date startDate = sdf.parse("2013-10-01 12:30:00 PM");
-				Date endDate = sdf.parse("2013-10-01 01:30:00 PM");
+				String startDate = "2013-10-01 12:30:00 PM";
+				String endDate = "2013-10-01 01:30:00 PM";
 				TimeZone timeZone = TimeZone.getTimeZone("America/New_York");
 				String summary = "new item";
 				String description = "Test calendar item";
