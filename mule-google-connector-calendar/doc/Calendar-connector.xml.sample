@@ -1,5 +1,5 @@
 <!-- BEGIN_INCLUDE(google-calendar:create-event) -->
-	<google-calendar:create-event calendarId="test-calendar" startDate="2013-01-01T00:00:00" endDate="2013-01-01T00:00:00" timeZone="America/New_York" summary="test" description="a new event" location="conference room">
+	<google-calendar:create-event calendarId="test-calendar" startDate="2013-01-01 00:00:00 AM" endDate="2013-01-01 00:00:00 AM" timeZone="America/New_York" summary="test" description="a new event" location="conference room">
         <google-calendar:guest-list>
         </google-calendar:guest-list>
      </google-calendar:create-event>
