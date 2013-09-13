@@ -11,7 +11,7 @@
      </google-calendar:update-event>
 <!-- END_INCLUDE(google-calendar:update-event) -->
 <!-- BEGIN_INCLUDE(google-calendar:find-events) -->
-	<google-calendar:find-events calendarId="event-summary" eventSummary="test-event" eventDescription="test" startDate="2013-01-01 00:00:00 AM" endDate="2013-01-01 00:00:00 AM" >
+	<google-calendar:find-events calendarId="event-summary" eventSummary="test-event" eventDescription="test" startDate="2013-01-01T00:00:00" endDate="2013-01-01T00:00:00" >
     </google-calendar:find-events>
 <!-- END_INCLUDE(google-calendar:find-events) -->
 <!-- BEGIN_INCLUDE(google-calendar:create-calendar) -->
