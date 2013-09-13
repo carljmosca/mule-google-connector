@@ -182,9 +182,9 @@ public class CalendarConnector {
 	 * @param eventSummary
 	 * 			summary (name) of event	
 	 * @param eventDescription
-	 * 
+	 * 			description of event (option)
 	 * @param startDate
-	 * 
+	 * 			startDate of event (optional) 
 	 * @param endDate
 	 * 			endDate of event (optional)
 	 * @return list of events
