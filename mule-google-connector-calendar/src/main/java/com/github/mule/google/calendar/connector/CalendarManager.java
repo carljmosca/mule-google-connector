@@ -96,7 +96,7 @@ public class CalendarManager {
 			if (calendar != null) {
 				updateEvent(calendar, event, startDate, endDate, timeZone, summary, description, location, guestList);
 			}
-		} catch (IOException e) {
+		} catch (Exception e) {
 			LOGGER.error(e);
 			result = e.getMessage();
 		}
@@ -209,30 +209,19 @@ public class CalendarManager {
 	public List<Event> searchEvent(String calendarId, String summary,
 			String description) {
 		List<Event> result = new ArrayList<Event>(0);
-		String pageToken = null;
-		do {
-			Events events = null;
-			try {
-				events = client.events().list(calendarId)
-						.setPageToken(pageToken).execute();
-			} catch (IOException e) {
-				LOGGER.error(e);
+		List<Event> events = getCalendarEvents(calendarId);
+		for (Event event : events) {
+			boolean found = false;
+			if (summary != null && summary.length() > 0 && event.getSummary().indexOf(summary) >= 0) {
+				found = true;
 			}
-			List<Event> items = events.getItems();
-			for (Event event : items) {
-				boolean found = false;
-				if (summary != null && summary.length() > 0 && event.getSummary().indexOf(summary) >= 0) {
-					found = true;
-				}
-				if (!found && description != null && description.length() > 0 && event.getDescription().indexOf(description) >= 0) {
-					found = true;
-				}
-				if (found){
-					result.add(event);
-				}
+			if (!found && description != null && description.length() > 0 && event.getDescription().indexOf(description) >= 0) {
+				found = true;
 			}
-			pageToken = events.getNextPageToken();
-		} while (pageToken != null);
+			if (found){
+				result.add(event);
+			}			
+		}
 		return result;
 	}
 	
@@ -261,7 +250,7 @@ public class CalendarManager {
 	
 	private static Event updateEvent(Calendar calendar, Event event, String startDate,
 			String endDate, TimeZone timeZone, String summary, String description, String location,
-			List<String> guestList) throws IOException {
+			List<String> guestList) throws Exception {
 		event.setSummary(summary);
 		event.setDescription(description);
 		event.setLocation(location);
