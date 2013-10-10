@@ -227,4 +227,21 @@ public class CalendarConnector {
 		CalendarManager manager = new CalendarManager();
 		return manager.deleteCalendar(calendarId);
 	}
+	
+	/**
+	 * deleteEvent processor
+	 * 
+	 * {@sample.xml ../../../doc/Calendar-connector.xml.sample google-calendar:delete-event}
+	 * 
+	 * @param calendarId
+	 *            calendarId of calendar
+	 * @param eventId
+	 * 			  eventId to delete           
+	 * @return boolean
+	 * */
+	@Processor
+	public Boolean deleteEvent(String calendarId, String eventId) {
+		CalendarManager manager = new CalendarManager();
+		return manager.deleteEvent(calendarId, eventId);
+	}
 }
