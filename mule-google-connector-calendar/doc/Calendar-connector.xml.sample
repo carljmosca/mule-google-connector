@@ -1,17 +1,16 @@
 <!-- BEGIN_INCLUDE(google-calendar:create-event) -->
-	<google-calendar:create-event calendarId="test-calendar" startDate="2013-01-01 00:00:00 AM" endDate="2013-01-01 00:00:00 AM" timeZone="America/New_York" summary="test" description="a new event" location="conference room">
-        <google-calendar:guest-list>
-        </google-calendar:guest-list>
+	<google-calendar:create-event>
+		<google-calendar:calendar-event/>
      </google-calendar:create-event>
 <!-- END_INCLUDE(google-calendar:create-event) -->
 <!-- BEGIN_INCLUDE(google-calendar:update-event) -->
-	<google-calendar:update-event calendarId="test-calendar" eventId="test-event" startDate="2013-01-01 00:00:00 AM" endDate="2013-01-01 00:00:00 AM" timeZone="America/New_York" summary="test" description="a new event" location="conference room">
-        <google-calendar:guest-list>
-        </google-calendar:guest-list>
+	<google-calendar:update-event>
+		<google-calendar:calendar-event/>
      </google-calendar:update-event>
 <!-- END_INCLUDE(google-calendar:update-event) -->
 <!-- BEGIN_INCLUDE(google-calendar:find-events) -->
-	<google-calendar:find-events calendarId="event-summary" eventSummary="test-event" eventDescription="test" startDate="2013-01-01T00:00:00" endDate="2013-01-01T00:00:00" >
+	<google-calendar:find-events>
+		<google-calendar:calendar-event/>
     </google-calendar:find-events>
 <!-- END_INCLUDE(google-calendar:find-events) -->
 <!-- BEGIN_INCLUDE(google-calendar:create-calendar) -->
@@ -24,7 +23,9 @@
     <google-calendar:delete-calendar calendarId="#[map-payload:content]" />
 <!-- END_INCLUDE(google-calendar:delete-calendar) -->
 <!-- BEGIN_INCLUDE(google-calendar:delete-event) -->
-    <google-calendar:delete-event calendarId="test-calendar" eventId="test-event" />
+    <google-calendar:delete-event>
+		<google-calendar:calendar-event/>    
+    </google-calendar:delete-event>
 <!-- END_INCLUDE(google-calendar:delete-event) -->
 <!-- BEGIN_INCLUDE(google-calendar:clear-calendar) -->
     <google-calendar:clear-calendar calendarId="#[map-payload:content]" />

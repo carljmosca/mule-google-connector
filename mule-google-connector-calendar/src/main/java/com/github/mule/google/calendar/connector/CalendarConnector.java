@@ -12,7 +12,6 @@ import org.mule.api.annotations.Disconnect;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.ValidateConnection;
 import org.mule.api.annotations.param.ConnectionKey;
-import org.mule.api.annotations.param.Optional;
 
 import com.github.mule.google.wrapper.Calendar;
 import com.github.mule.google.wrapper.CalendarEvent;
@@ -77,24 +76,10 @@ public class CalendarConnector {
 	 * 
 	 * {@sample.xml ../../../doc/Calendar-connector.xml.sample google-calendar:create-event}
 	 * 
-	 * @param calendarId
-	 *            name of calendar to be processed
-	 * @param startDate
-	 *            start date/time of event
-	 * @param endDate
-	 *            end date/time of event
-	 * @param timeZone
-	 *            timeZone of event
-	 * @param summary
-	 *            summary of event
-	 * @param description
-	 *            description of event
-	 * @param location
-	 *            location of event
-	 * @param guestList
-	 *            list of guests to invite
-	 * @return string
-	 * */
+	 * @param calendarEvent
+	 *            calendarEvent to create
+	 * @return operationResult
+	 */
 	@Processor
 	public OperationResult createEvent(CalendarEvent calendarEvent) {
 		CalendarManager manager = new CalendarManager();
@@ -140,7 +125,7 @@ public class CalendarConnector {
 	 * 
 	 * @param summary
 	 *            summary (name) of calendar
-	 * @return calendar
+	 * @return operationResult
 	 * */
 	@Processor
 	public Calendar findCalendar(String summary) {
@@ -199,10 +184,8 @@ public class CalendarConnector {
 	 * 
 	 * {@sample.xml ../../../doc/Calendar-connector.xml.sample google-calendar:delete-event}
 	 * 
-	 * @param calendarId
-	 *            calendarId of calendar
-	 * @param eventId
-	 * 			  eventId to delete           
+	 * @param calendarEvent
+	 *            calendarEvent of calendar        
 	 * @return boolean
 	 * */
 	@Processor
