@@ -1,9 +1,7 @@
 package com.github.mule.google.calendar.connector;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 
 import org.apache.log4j.Logger;
 import org.mule.api.ConnectionException;
@@ -16,6 +14,9 @@ import org.mule.api.annotations.ValidateConnection;
 import org.mule.api.annotations.param.ConnectionKey;
 import org.mule.api.annotations.param.Optional;
 
+import com.github.mule.google.wrapper.Calendar;
+import com.github.mule.google.wrapper.CalendarEvent;
+import com.github.mule.google.wrapper.OperationResult;
 import com.google.api.services.calendar.model.Event;
 
 /**
@@ -95,13 +96,9 @@ public class CalendarConnector {
 	 * @return string
 	 * */
 	@Processor
-	public String createEvent(String calendarId, String startDate,
-			String endDate, String timeZone, String summary,
-			String description, String location, List<String> guestList) {
+	public OperationResult createEvent(CalendarEvent calendarEvent) {
 		CalendarManager manager = new CalendarManager();
-		TimeZone tz = TimeZone.getTimeZone(timeZone);
-		return manager.createEvent(calendarId, startDate, endDate, tz, summary,
-				description, location, guestList);
+		return manager.createEvent(calendarEvent);
 	}
 
 	/**
@@ -109,36 +106,15 @@ public class CalendarConnector {
 	 * 
 	 * {@sample.xml ../../../doc/Calendar-connector.xml.sample google-calendar:update-event}
 	 * 
-	 * @param calendarId
-	 *            id of calendar to be processed
-	 * @param eventId
-	 *            id of event to be processed
-	 * @param startDate
-	 *            start date/time of event
-	 * @param endDate
-	 *            end date/time of event
-	 * @param timeZone
-	 *            timeZone of event
-	 * @param summary
-	 *            summary of event
-	 * @param description
-	 *            description of event
-	 * @param location
-	 *            location of event
-	 * @param guestList
-	 *            list of guests to invite
+	 * @param calendarEvent
+	 *            calendarEvent to be processed
 	 * @return string
 	 * */
 	@Processor
-	public String updateEvent(String calendarId, String eventId,
-			String startDate, String endDate, String timeZone, String summary,
-			String description, String location, List<String> guestList) {
+	public OperationResult updateEvent(CalendarEvent calendarEvent) {
 		CalendarManager manager = new CalendarManager();
-		TimeZone tz = TimeZone.getTimeZone(timeZone);
-		String result = "";
-		result = manager.updateEvent(calendarId, eventId, startDate, endDate,
-				tz, summary, description, location, guestList);
-		LOGGER.debug("updateEvent: " + calendarId);
+		OperationResult result = manager.updateEvent(calendarEvent);
+		LOGGER.debug("updateEvent: " + calendarEvent.getCalendarId());
 		return result;
 	}
 
@@ -152,7 +128,7 @@ public class CalendarConnector {
 	 * @return string
 	 * */
 	@Processor
-	public String createCalendar(String summary) {
+	public OperationResult createCalendar(String summary) {
 		CalendarManager manager = new CalendarManager();
 		return manager.createCalendar(summary);
 	}
@@ -164,10 +140,10 @@ public class CalendarConnector {
 	 * 
 	 * @param summary
 	 *            summary (name) of calendar
-	 * @return string
+	 * @return calendar
 	 * */
 	@Processor
-	public String findCalendar(String summary) {
+	public Calendar findCalendar(String summary) {
 		CalendarManager manager = new CalendarManager();
 		return manager.findCalendar(summary);
 	}
@@ -177,25 +153,15 @@ public class CalendarConnector {
 	 * 
 	 * {@sample.xml ../../../doc/Calendar-connector.xml.sample google-calendar:find-events}
 	 * 
-	 * @param calendarId
-	 * 			calendarId of calendar
-	 * @param eventSummary
-	 * 			summary (name) of event	
-	 * @param eventDescription
-	 * 			description of event (option)
-	 * @param startDate
-	 * 			startDate of event (optional) 
-	 * @param endDate
-	 * 			endDate of event (optional)
+	 * @param calendarEvent
+	 * 			calendarEvent search values 
 	 * @return list of events
 	 */
 	@Processor
-	public List<Event> findEvents(String calendarId, @Optional String eventSummary,
-			@Optional String eventDescription, 
-			@Optional Date startDate, @Optional Date endDate) {
+	public List<Event> findEvents(CalendarEvent calendarEvent) {
 		List<Event> result = new ArrayList<Event>(0);
-		
-		return result;
+		CalendarManager manager = new CalendarManager();
+		return manager.searchEvent(calendarEvent);
 	}
 
 	/**
@@ -208,7 +174,7 @@ public class CalendarConnector {
 	 * @return boolean
 	 * */
 	@Processor
-	public Boolean clearCalendar(String calendarId) {
+	public OperationResult clearCalendar(String calendarId) {
 		CalendarManager manager = new CalendarManager();
 		return manager.clearCalendar(calendarId);
 	}
@@ -223,7 +189,7 @@ public class CalendarConnector {
 	 * @return boolean
 	 * */
 	@Processor
-	public Boolean deleteCalendar(String calendarId) {
+	public OperationResult deleteCalendar(String calendarId) {
 		CalendarManager manager = new CalendarManager();
 		return manager.deleteCalendar(calendarId);
 	}
@@ -240,8 +206,8 @@ public class CalendarConnector {
 	 * @return boolean
 	 * */
 	@Processor
-	public Boolean deleteEvent(String calendarId, String eventId) {
+	public OperationResult deleteEvent(CalendarEvent calendarEvent) {
 		CalendarManager manager = new CalendarManager();
-		return manager.deleteEvent(calendarId, eventId);
+		return manager.deleteEvent(calendarEvent);
 	}
 }

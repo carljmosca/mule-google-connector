@@ -7,11 +7,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 
 import org.apache.log4j.Logger;
 
 import com.github.mule.google.calendar.connector.utility.Utility;
+import com.github.mule.google.wrapper.Attendee;
+import com.github.mule.google.wrapper.CalendarEvent;
+import com.github.mule.google.wrapper.OperationResult;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
@@ -33,7 +35,6 @@ import com.google.api.services.calendar.model.EventDateTime;
 import com.google.api.services.calendar.model.Events;
 
 public class CalendarManager {
-	
 
 	private static Logger LOGGER = Logger.getLogger(CalendarManager.class);
 	private static com.google.api.services.calendar.Calendar client;
@@ -43,7 +44,8 @@ public class CalendarManager {
 	private static final String APPLICATION_NAME = "CalendarDemo/1.0";
 	private static FileDataStoreFactory dataStoreFactory;
 	private static final java.io.File DATA_STORE_DIR = new java.io.File(
-			System.getProperty("user.home"), ".store/google_calendar_data_store");
+			System.getProperty("user.home"),
+			".store/google_calendar_data_store");
 
 	public CalendarManager() {
 		try {
@@ -68,93 +70,115 @@ public class CalendarManager {
 		}
 	}
 
-	public String createEvent(String calendarId, String startDate, String endDate,
-			TimeZone timeZone, String summary, String description, String location,
-			List<String> guestList) {
-		String result = "";
+	/**
+	 * 
+	 * @param calendarEvent
+	 * @return
+	 */
+	public OperationResult createEvent(CalendarEvent calendarEvent) {
+		OperationResult result = new OperationResult();
 		Calendar calendar = null;
 		try {
-			calendar = getCalendar(calendarId);
+			calendar = getCalendar(calendarEvent.getCalendarId());
 			if (calendar != null) {
-				addEvent(calendar, startDate, endDate, timeZone, summary, description, location, guestList);
+				addEvent(calendarEvent);
+				result.setSuccess(true);
 			}
 		} catch (IOException e) {
 			LOGGER.error(e);
-			result = e.getMessage();
+			result.setMessage(e.getMessage());
 		}
 		return result;
 	}
-	
-	public String updateEvent(String calendarId, String eventId, String startDate, String endDate,
-			TimeZone timeZone, String summary, String description, String location,
-			List<String> guestList) {
-		String result = "";
+
+	/**
+	 * 
+	 * @param calendarEvent
+	 * @return
+	 */
+	public OperationResult updateEvent(CalendarEvent calendarEvent) {
+		OperationResult result = new OperationResult();
 		Calendar calendar = null;
 		Event event = null;
 		try {
-			calendar = getCalendar(calendarId);
-			if (calendar != null) {
-				updateEvent(calendar, event, startDate, endDate, timeZone, summary, description, location, guestList);
+			Event originalEvent = getCalendarEvent(
+					calendarEvent.getCalendarId(), calendarEvent.getEventId());
+			if (originalEvent != null) {
+				calendar = getCalendar(calendarEvent.getCalendarId());
+
+				if (calendar != null) {
+					event = addEvent(calendarEvent);
+					result.setId(event.getId());
+					result.setSuccess(event != null);
+					if (result.isSuccess()) {
+						deleteEvent(calendarEvent);
+					}
+				}
 			}
 		} catch (Exception e) {
 			LOGGER.error(e);
-			result = e.getMessage();
+			result.setMessage(e.getMessage());
 		}
 		return result;
 	}
 
-	public String createCalendar(String calendarSummary) {
-		String calendarId = "";
+	public OperationResult createCalendar(String calendarSummary) {
+		OperationResult result = new OperationResult();
 		try {
 			Calendar calendar = addCalendar(calendarSummary);
-			calendarId = calendar.getId();
+			result.setId(calendar.getId());
+			result.setSuccess(true);
 		} catch (IOException e) {
 			LOGGER.error(e);
+			result.setMessage(e.getMessage());
 		}
-		return calendarId;
+		return result;
 	}
 
-	public boolean deleteCalendar(String calendarId) {
-		boolean result = false;
+	public OperationResult deleteCalendar(String calendarId) {
+		OperationResult result = new OperationResult();
 		try {
 			client.calendars().delete(calendarId).execute();
-			result = true;
+			result.setSuccess(true);
 		} catch (IOException e) {
 			LOGGER.error(e);
+			result.setMessage(e.getMessage());
 		}
 		return result;
 	}
-	
-	public boolean deleteEvent(String calendarId, String eventId) {
-		boolean result = false;
+
+	public OperationResult deleteEvent(CalendarEvent calendarEvent) {
+		OperationResult result = new OperationResult();
 		try {
-			List<Event> events = getCalendarEvents(calendarId);
+			List<Event> events = getCalendarEvents(calendarEvent.getCalendarId());
 			for (Event event : events) {
-				if (eventId.equals(event.getId())) {
-					client.events().delete(calendarId, event.getId()).execute();
+				if (calendarEvent.getEventId().equals(event.getId())) {
+					client.events().delete(calendarEvent.getCalendarId(), event.getId()).execute();
+					result.setSuccess(true);
+					return result;
 				}
 			}
-			result = true;
 		} catch (IOException e) {
-			
+			result.setMessage(e.getMessage());
 		}
 		return result;
 	}
-	
-	public boolean clearCalendar(String calendarId) {
-		boolean result = false;
+
+	public OperationResult clearCalendar(String calendarId) {
+		OperationResult result = new OperationResult();
 		try {
 			List<Event> events = getCalendarEvents(calendarId);
 			for (Event event : events) {
 				client.events().delete(calendarId, event.getId()).execute();
 			}
-			result = true;
+			result.setSuccess(true);
 		} catch (IOException e) {
 			LOGGER.error(e);
-		}		
+			result.setMessage(e.getMessage());
+		}
 		return result;
 	}
-	
+
 	private List<Event> getCalendarEvents(String calendarId) {
 		List<Event> result = new ArrayList<Event>(0);
 		String pageToken = null;
@@ -175,17 +199,28 @@ public class CalendarManager {
 		return result;
 	}
 	
-	public boolean calendarExists(String calendarId) {
-		boolean found = false;
+	private Event getCalendarEvent(String calendarId, String eventId) {
+		List<Event> events = getCalendarEvents(calendarId);
+		for (Event event : events) {
+			if (event.getId().equals(eventId)) {
+				return event;
+			}
+		}
+		return null;
+	}
+
+	public OperationResult calendarExists(String calendarId) {
+		OperationResult result = new OperationResult();
 		try {
 			Calendar calendar = getCalendar(calendarId);
-			found = calendar != null;
+			result.setSuccess(calendar != null);
 		} catch (IOException e) {
 			LOGGER.error(e);
+			result.setMessage(e.getMessage());
 		}
-		return found;
+		return result;
 	}
-	
+
 	private static Calendar addCalendar(String calendarSummary)
 			throws IOException {
 		Calendar entry = new Calendar();
@@ -194,14 +229,13 @@ public class CalendarManager {
 		return result;
 	}
 
-	private static Calendar getCalendar(String calendarId)
-			throws IOException {
+	private static Calendar getCalendar(String calendarId) throws IOException {
 		Calendar result = client.calendars().get(calendarId).execute();
 		return result;
 	}
-	
-	public String findCalendar(String summary) {
-		String result = null;
+
+	public com.github.mule.google.wrapper.Calendar findCalendar(String summary) {
+		com.github.mule.google.wrapper.Calendar result = null;
 		String pageToken = null;
 		do {
 			CalendarList calendarList = null;
@@ -214,7 +248,11 @@ public class CalendarManager {
 
 			for (CalendarListEntry calendarListEntry : items) {
 				if (calendarListEntry.getSummary().equals(summary)) {
-					return calendarListEntry.getId();
+					result = new com.github.mule.google.wrapper.Calendar();
+					result.setId(calendarListEntry.getId());
+					result.setDescription(calendarListEntry.getDescription());
+					result.setSummary(calendarListEntry.getSummary());
+					return result;
 				}
 			}
 			pageToken = calendarList.getNextPageToken();
@@ -222,90 +260,90 @@ public class CalendarManager {
 		return result;
 	}
 
-	public List<Event> searchEvent(String calendarId, String summary,
-			String description) {
+	public List<Event> searchEvent(CalendarEvent calendarEvent) {
+		return searchEvent(calendarEvent, "yyyy-MM-dd HH:mm:ss");
+	}
+	
+	public List<Event> searchEvent(CalendarEvent calendarEvent, String dateFormat) {
 		List<Event> result = new ArrayList<Event>(0);
-		List<Event> events = getCalendarEvents(calendarId);
+		List<Event> events = getCalendarEvents(calendarEvent.getCalendarId());
 		for (Event event : events) {
 			boolean found = false;
-			if (summary != null && summary.length() > 0 && event.getSummary().indexOf(summary) >= 0) {
-				found = true;
+			if (calendarEvent.getEventId() != null && calendarEvent.getEventId().length() > 0) {
+				found = event.getId().equals(calendarEvent.getEventId());
+				if (!found)
+					break;
 			}
-			if (!found && description != null && description.length() > 0 && event.getDescription().indexOf(description) >= 0) {
-				found = true;
+			if (calendarEvent.getSummary() != null && calendarEvent.getSummary().length() > 0) {
+				found = event.getSummary().indexOf(calendarEvent.getSummary()) >= 0;
+				if (!found)
+					break;
 			}
-			if (found){
+			if (!found && calendarEvent.getDescription() != null && calendarEvent.getDescription().length() > 0) {
+				found = event.getDescription().indexOf(calendarEvent.getDescription()) >= 0;
+				if (!found)
+					break;
+			}
+			if (calendarEvent.getStart() != null) {
+				found = Utility.compareDates(new Date(event.getStart().getDateTime().getValue()),
+						calendarEvent.getStart().getTime(), dateFormat);
+				if (!found)
+					break;
+			}
+			if (found) {
 				result.add(event);
-			}			
-		}
-		return result;
-	}
-	
-	private static Event addEvent(Calendar calendar, String startDate,
-			String endDate, TimeZone timeZone, String summary, String description, String location,
-			List<String> guestList) throws IOException {
-		Event event = newEvent(Utility.stringToDate(startDate), Utility.stringToDate(endDate), timeZone);
-		event.setSummary(summary);
-		event.setDescription(description);
-		event.setLocation(location);
-		boolean sendNotificaitons = false;
-		if (guestList != null && !guestList.isEmpty()) {
-			List<EventAttendee> attendees = new ArrayList<EventAttendee>(0);
-			for (String email : guestList) {
-				EventAttendee ea = new EventAttendee();
-				ea.setEmail(email);
-				attendees.add(ea);
-				sendNotificaitons = true;
 			}
-			event.setAttendees(attendees);
 		}
-		Event result = client.events().insert(calendar.getId(), event).setSendNotifications(sendNotificaitons)
-				.execute();	
-		return result;
-	}
-	
-	private static Event updateEvent(Calendar calendar, Event event, String startDate,
-			String endDate, TimeZone timeZone, String summary, String description, String location,
-			List<String> guestList) throws Exception {
-		event.setSummary(summary);
-		event.setDescription(description);
-		event.setLocation(location);
-		boolean sendNotificaitons = false;
-		if (guestList != null && !guestList.isEmpty()) {
-			List<EventAttendee> attendees = new ArrayList<EventAttendee>(0);
-			for (String email : guestList) {
-				EventAttendee ea = new EventAttendee();
-				ea.setEmail(email);
-				attendees.add(ea);
-				sendNotificaitons = true;
-			}
-			event.setAttendees(attendees);
-		}
-		Event result = client.events().insert(calendar.getId(), event).setSendNotifications(sendNotificaitons)
-				.execute();	
 		return result;
 	}
 
-	private static Event newEvent(Date startDate, Date endDate, TimeZone timeZone) {
+	private static Event addEvent(CalendarEvent calendarEvent)
+			throws IOException {
+		Event event = newEvent(calendarEvent.getStart(),
+				calendarEvent.getEnd());
+		event.setSummary(calendarEvent.getSummary());
+		event.setDescription(calendarEvent.getDescription());
+		event.setLocation(calendarEvent.getLocation());
+		boolean sendNotificaitons = false;
+		if (calendarEvent.getAttendees() != null && !calendarEvent.getAttendees().isEmpty()) {
+			List<EventAttendee> eventAttendees = new ArrayList<EventAttendee>(0);
+			for (Attendee attendee : calendarEvent.getAttendees()) {
+				EventAttendee ea = new EventAttendee();
+				if (attendee.getEmail() != null)
+					ea.setEmail(attendee.getEmail());
+				if (attendee.getName() != null)
+					ea.setDisplayName(attendee.getName());
+				eventAttendees.add(ea);
+				sendNotificaitons = true;
+			}
+			event.setAttendees(eventAttendees);
+		}
+		Event result = client.events().insert(calendarEvent.getCalendarId(), event)
+				.setSendNotifications(sendNotificaitons).execute();
+		return result;
+	}
+
+	private static Event newEvent(java.util.Calendar startDate, 
+			java.util.Calendar endDate) {
 		Event event = new Event();
 		event.setSummary("New Event");
-		DateTime start = new DateTime(startDate, timeZone);
+		DateTime start = new DateTime(startDate.getTime(), startDate.getTimeZone());
 		event.setStart(new EventDateTime().setDateTime(start));
-		DateTime end = new DateTime(endDate, timeZone);
+		DateTime end = new DateTime(endDate.getTime(), endDate.getTimeZone());
 		event.setEnd(new EventDateTime().setDateTime(end));
 		return event;
 	}
-	
+
 	/**
 	 * Authorizes the installed application to access user's protected data.
 	 */
 	private static Credential authorize() throws Exception {
 		// load client secrets
 		GoogleAuthorizationCodeFlow flow = null;
-		FileInputStream CLIENT_SECRETS_FILE = new FileInputStream(System.getProperty("user.home") + "/.store/client_secrets.json");
+		FileInputStream CLIENT_SECRETS_FILE = new FileInputStream(
+				System.getProperty("user.home") + "/.store/client_secrets.json");
 		GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(
-				JSON_FACTORY,
-				new InputStreamReader(CLIENT_SECRETS_FILE));
+				JSON_FACTORY, new InputStreamReader(CLIENT_SECRETS_FILE));
 		if (clientSecrets.getDetails().getClientId().startsWith("Enter")
 				|| clientSecrets.getDetails().getClientSecret()
 						.startsWith("Enter ")) {
