@@ -125,6 +125,22 @@ public class CalendarManager {
 		return result;
 	}
 	
+	public boolean deleteEvent(String calendarId, String eventId) {
+		boolean result = false;
+		try {
+			List<Event> events = getCalendarEvents(calendarId);
+			for (Event event : events) {
+				if (eventId.equals(event.getId())) {
+					client.events().delete(calendarId, event.getId()).execute();
+				}
+			}
+			result = true;
+		} catch (IOException e) {
+			
+		}
+		return result;
+	}
+	
 	public boolean clearCalendar(String calendarId) {
 		boolean result = false;
 		try {
