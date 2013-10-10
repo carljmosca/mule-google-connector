@@ -23,6 +23,9 @@
 <!-- BEGIN_INCLUDE(google-calendar:delete-calendar) -->
     <google-calendar:delete-calendar calendarId="#[map-payload:content]" />
 <!-- END_INCLUDE(google-calendar:delete-calendar) -->
+<!-- BEGIN_INCLUDE(google-calendar:delete-event) -->
+    <google-calendar:delete-event calendarId="test-calendar" eventId="test-event" />
+<!-- END_INCLUDE(google-calendar:delete-event) -->
 <!-- BEGIN_INCLUDE(google-calendar:clear-calendar) -->
     <google-calendar:clear-calendar calendarId="#[map-payload:content]" />
 <!-- END_INCLUDE(google-calendar:clear-calendar) -->
