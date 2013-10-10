@@ -150,10 +150,13 @@ public class CalendarManager {
 	public OperationResult deleteEvent(CalendarEvent calendarEvent) {
 		OperationResult result = new OperationResult();
 		try {
-			List<Event> events = getCalendarEvents(calendarEvent.getCalendarId());
+			List<Event> events = getCalendarEvents(calendarEvent
+					.getCalendarId());
 			for (Event event : events) {
 				if (calendarEvent.getEventId().equals(event.getId())) {
-					client.events().delete(calendarEvent.getCalendarId(), event.getId()).execute();
+					client.events()
+							.delete(calendarEvent.getCalendarId(),
+									event.getId()).execute();
 					result.setSuccess(true);
 					return result;
 				}
@@ -198,7 +201,7 @@ public class CalendarManager {
 		} while (pageToken != null);
 		return result;
 	}
-	
+
 	private Event getCalendarEvent(String calendarId, String eventId) {
 		List<Event> events = getCalendarEvents(calendarId);
 		for (Event event : events) {
@@ -263,30 +266,36 @@ public class CalendarManager {
 	public List<Event> searchEvent(CalendarEvent calendarEvent) {
 		return searchEvent(calendarEvent, "yyyy-MM-dd HH:mm:ss");
 	}
-	
-	public List<Event> searchEvent(CalendarEvent calendarEvent, String dateFormat) {
+
+	public List<Event> searchEvent(CalendarEvent calendarEvent,
+			String dateFormat) {
 		List<Event> result = new ArrayList<Event>(0);
 		List<Event> events = getCalendarEvents(calendarEvent.getCalendarId());
 		for (Event event : events) {
 			boolean found = false;
-			if (calendarEvent.getEventId() != null && calendarEvent.getEventId().length() > 0) {
+			if (calendarEvent.getEventId() != null
+					&& calendarEvent.getEventId().length() > 0) {
 				found = event.getId().equals(calendarEvent.getEventId());
 				if (!found)
 					break;
 			}
-			if (calendarEvent.getSummary() != null && calendarEvent.getSummary().length() > 0) {
+			if (calendarEvent.getSummary() != null
+					&& calendarEvent.getSummary().length() > 0) {
 				found = event.getSummary().indexOf(calendarEvent.getSummary()) >= 0;
 				if (!found)
 					break;
 			}
-			if (!found && calendarEvent.getDescription() != null && calendarEvent.getDescription().length() > 0) {
-				found = event.getDescription().indexOf(calendarEvent.getDescription()) >= 0;
+			if (!found && calendarEvent.getDescription() != null
+					&& calendarEvent.getDescription().length() > 0) {
+				found = event.getDescription().indexOf(
+						calendarEvent.getDescription()) >= 0;
 				if (!found)
 					break;
 			}
 			if (calendarEvent.getStart() != null) {
-				found = Utility.compareDates(new Date(event.getStart().getDateTime().getValue()),
-						calendarEvent.getStart().getTime(), dateFormat);
+				found = Utility.compareDates(new Date(event.getStart()
+						.getDateTime().getValue()), calendarEvent.getStart()
+						.getTime(), dateFormat);
 				if (!found)
 					break;
 			}
@@ -299,13 +308,13 @@ public class CalendarManager {
 
 	private static Event addEvent(CalendarEvent calendarEvent)
 			throws IOException {
-		Event event = newEvent(calendarEvent.getStart(),
-				calendarEvent.getEnd());
+		Event event = newEvent(calendarEvent.getStart(), calendarEvent.getEnd());
 		event.setSummary(calendarEvent.getSummary());
 		event.setDescription(calendarEvent.getDescription());
 		event.setLocation(calendarEvent.getLocation());
 		boolean sendNotificaitons = false;
-		if (calendarEvent.getAttendees() != null && !calendarEvent.getAttendees().isEmpty()) {
+		if (calendarEvent.getAttendees() != null
+				&& !calendarEvent.getAttendees().isEmpty()) {
 			List<EventAttendee> eventAttendees = new ArrayList<EventAttendee>(0);
 			for (Attendee attendee : calendarEvent.getAttendees()) {
 				EventAttendee ea = new EventAttendee();
@@ -318,16 +327,18 @@ public class CalendarManager {
 			}
 			event.setAttendees(eventAttendees);
 		}
-		Event result = client.events().insert(calendarEvent.getCalendarId(), event)
+		Event result = client.events()
+				.insert(calendarEvent.getCalendarId(), event)
 				.setSendNotifications(sendNotificaitons).execute();
 		return result;
 	}
 
-	private static Event newEvent(java.util.Calendar startDate, 
+	private static Event newEvent(java.util.Calendar startDate,
 			java.util.Calendar endDate) {
 		Event event = new Event();
 		event.setSummary("New Event");
-		DateTime start = new DateTime(startDate.getTime(), startDate.getTimeZone());
+		DateTime start = new DateTime(startDate.getTime(),
+				startDate.getTimeZone());
 		event.setStart(new EventDateTime().setDateTime(start));
 		DateTime end = new DateTime(endDate.getTime(), endDate.getTimeZone());
 		event.setEnd(new EventDateTime().setDateTime(end));
