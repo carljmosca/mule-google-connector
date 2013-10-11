@@ -1,10 +1,12 @@
 package com.github.mule.google.wrapper;
 
-public class OperationResult {
+import com.google.api.client.json.GenericJson;
 
-	private String message;
-	private boolean success;
-	private String id;
+public class OperationResult extends GenericJson {
+
+	private String message = "";
+	private boolean success = false;
+	private String id = "";
 	
 	public OperationResult() {
 		

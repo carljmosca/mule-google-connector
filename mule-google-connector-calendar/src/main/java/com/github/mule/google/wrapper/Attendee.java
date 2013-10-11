@@ -1,6 +1,8 @@
 package com.github.mule.google.wrapper;
 
-public class Attendee {
+import com.google.api.client.json.GenericJson;
+
+public class Attendee extends GenericJson {
 
 	private String email;
 	private String mobile;

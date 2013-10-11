@@ -1,6 +1,8 @@
 package com.github.mule.google.wrapper;
 
-public class Calendar {
+import com.google.api.client.json.GenericJson;
+
+public class Calendar extends GenericJson {
 
 	private String id;
 	private String summary;
