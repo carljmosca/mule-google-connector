@@ -12,6 +12,8 @@ import org.mule.api.annotations.Disconnect;
 import org.mule.api.annotations.Processor;
 import org.mule.api.annotations.ValidateConnection;
 import org.mule.api.annotations.param.ConnectionKey;
+import org.mule.api.annotations.param.Default;
+import org.mule.api.annotations.param.Optional;
 
 import com.github.mule.google.wrapper.Calendar;
 import com.github.mule.google.wrapper.CalendarEvent;
@@ -81,7 +83,7 @@ public class CalendarConnector {
 	 * @return operationResult
 	 */
 	@Processor
-	public OperationResult createEvent(CalendarEvent calendarEvent) {
+	public OperationResult createEvent(@Optional @Default("#[payload]") CalendarEvent calendarEvent) {
 		CalendarManager manager = new CalendarManager();
 		return manager.createEvent(calendarEvent);
 	}
