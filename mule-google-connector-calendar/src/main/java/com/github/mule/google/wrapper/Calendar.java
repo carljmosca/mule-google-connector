@@ -1,8 +1,14 @@
 package com.github.mule.google.wrapper;
 
+import java.io.Serializable;
 
-public class Calendar {
 
+public class Calendar implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -3010767421694926623L;
 	private String id;
 	private String summary;
 	private String description;
@@ -30,6 +36,12 @@ public class Calendar {
 	}
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	@Override
+	public String toString() {
+		return "Calendar [id=" + id + ", summary=" + summary + ", description="
+				+ description + "]";
 	}
 	
 	

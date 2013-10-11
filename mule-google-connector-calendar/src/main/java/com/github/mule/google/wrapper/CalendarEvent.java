@@ -1,9 +1,14 @@
 package com.github.mule.google.wrapper;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class CalendarEvent {
+public class CalendarEvent implements Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 4697962219105356828L;
 	private String calendarId;
 	private String eventId;
 	private String summary;
@@ -80,4 +85,11 @@ public class CalendarEvent {
 		this.attendees = attendees;
 	}
 	
+	@Override
+	public String toString() {
+		return "CalendarEvent [calendarId=" + calendarId + ", eventId="
+				+ eventId + ", summary=" + summary + ", description="
+				+ description + ", start=" + start + ", end=" + end
+				+ ", location=" + location + ", attendees=" + attendees + "]";
+	}
 }
