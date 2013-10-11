@@ -83,6 +83,8 @@ public class CalendarManager {
 			if (calendar != null) {
 				addEvent(calendarEvent);
 				result.setSuccess(true);
+			} else {
+				LOGGER.debug("Could not getCalendar: " + calendarEvent.toString());
 			}
 		} catch (IOException e) {
 			LOGGER.error(e);
@@ -113,6 +115,8 @@ public class CalendarManager {
 					if (result.isSuccess()) {
 						deleteEvent(calendarEvent);
 					}
+				} else {
+					LOGGER.debug("Could not getCalendar: " + calendarEvent.toString());
 				}
 			}
 		} catch (Exception e) {
