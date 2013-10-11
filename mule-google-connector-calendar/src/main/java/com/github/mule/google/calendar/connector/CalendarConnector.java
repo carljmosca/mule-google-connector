@@ -78,12 +78,14 @@ public class CalendarConnector {
 	 * 
 	 * {@sample.xml ../../../doc/Calendar-connector.xml.sample google-calendar:create-event}
 	 * 
+	 * @param calendarId
+	 * 			  id of calendar
 	 * @param calendarEvent
 	 *            calendarEvent to create
 	 * @return operationResult
 	 */
 	@Processor
-	public OperationResult createEvent(@Optional @Default("#[payload]") CalendarEvent calendarEvent) {
+	public OperationResult createEvent(@Optional @Default("#[payload]")CalendarEvent calendarEvent) {
 		CalendarManager manager = new CalendarManager();
 		return manager.createEvent(calendarEvent);
 	}

@@ -317,20 +317,20 @@ public class CalendarManager {
 		event.setDescription(calendarEvent.getDescription());
 		event.setLocation(calendarEvent.getLocation());
 		boolean sendNotificaitons = false;
-		if (calendarEvent.getAttendees() != null
-				&& !calendarEvent.getAttendees().isEmpty()) {
-			List<EventAttendee> eventAttendees = new ArrayList<EventAttendee>(0);
-			for (Attendee attendee : calendarEvent.getAttendees()) {
-				EventAttendee ea = new EventAttendee();
-				if (attendee.getEmail() != null)
-					ea.setEmail(attendee.getEmail());
-				if (attendee.getName() != null)
-					ea.setDisplayName(attendee.getName());
-				eventAttendees.add(ea);
-				sendNotificaitons = true;
-			}
-			event.setAttendees(eventAttendees);
-		}
+//		if (calendarEvent.getAttendees() != null
+//				&& !calendarEvent.getAttendees().isEmpty()) {
+//			List<EventAttendee> eventAttendees = new ArrayList<EventAttendee>(0);
+//			for (Attendee attendee : calendarEvent.getAttendees()) {
+//				EventAttendee ea = new EventAttendee();
+//				if (attendee.getEmail() != null)
+//					ea.setEmail(attendee.getEmail());
+//				if (attendee.getName() != null)
+//					ea.setDisplayName(attendee.getName());
+//				eventAttendees.add(ea);
+//				sendNotificaitons = true;
+//			}
+//			event.setAttendees(eventAttendees);
+//		}
 		Event result = client.events()
 				.insert(calendarEvent.getCalendarId(), event)
 				.setSendNotifications(sendNotificaitons).execute();

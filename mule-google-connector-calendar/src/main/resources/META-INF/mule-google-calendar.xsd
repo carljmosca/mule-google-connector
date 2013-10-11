@@ -47,31 +47,61 @@
       <xs:documentation>createEvent processor</xs:documentation>
     </xs:annotation>
   </xs:element>
+  <xs:complexType name="CalendarEventObjectType">
+    <xs:sequence></xs:sequence>
+    <xs:attribute name="calendarId" use="optional" type="xs:string">
+      <xs:annotation>
+        <xs:documentation></xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="eventId" use="optional" type="xs:string">
+      <xs:annotation>
+        <xs:documentation></xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="summary" use="optional" type="xs:string">
+      <xs:annotation>
+        <xs:documentation></xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="description" use="optional" type="xs:string">
+      <xs:annotation>
+        <xs:documentation></xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/google-calendar" name="start" use="optional" type="dateTimeType">
+      <xs:annotation>
+        <xs:documentation></xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/google-calendar" name="end" use="optional" type="dateTimeType">
+      <xs:annotation>
+        <xs:documentation></xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="location" use="optional" type="xs:string">
+      <xs:annotation>
+        <xs:documentation></xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="ref" use="optional" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>The reference object for this parameter</xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
   <xs:complexType name="CreateEventType">
     <xs:complexContent>
       <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
         <xs:sequence>
-          <xs:element name="guest-list" maxOccurs="1" minOccurs="1">
+          <xs:element name="calendar-event" maxOccurs="1" minOccurs="0">
             <xs:annotation>
-              <xs:documentation>list of guests to invite</xs:documentation>
+              <xs:documentation>calendarEvent to create</xs:documentation>
             </xs:annotation>
             <xs:complexType>
-              <xs:sequence>
-                <xs:element name="guest-list" maxOccurs="unbounded" minOccurs="0">
-                  <xs:complexType>
-                    <xs:simpleContent>
-                      <xs:extension base="xs:string">
-                        <xs:attribute name="value-ref" use="optional" type="xs:string"></xs:attribute>
-                      </xs:extension>
-                    </xs:simpleContent>
-                  </xs:complexType>
-                </xs:element>
-              </xs:sequence>
-              <xs:attribute name="ref" use="optional" type="xs:string">
-                <xs:annotation>
-                  <xs:documentation>The reference object for this parameter</xs:documentation>
-                </xs:annotation>
-              </xs:attribute>
+              <xs:complexContent>
+                <xs:extension xmlns="http://www.mulesoft.org/schema/mule/google-calendar" base="CalendarEventObjectType"></xs:extension>
+              </xs:complexContent>
             </xs:complexType>
           </xs:element>
         </xs:sequence>
@@ -80,39 +110,42 @@
             <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
           </xs:annotation>
         </xs:attribute>
-        <xs:attribute name="calendarId" use="required" type="xs:string">
+        <xs:attribute name="username" use="optional" type="xs:string">
           <xs:annotation>
-            <xs:documentation>name of calendar to be processed</xs:documentation>
+            <xs:documentation>A username</xs:documentation>
           </xs:annotation>
         </xs:attribute>
-        <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/google-calendar" name="startDate" use="required" type="dateTimeType">
+        <xs:attribute name="password" use="optional" type="xs:string">
           <xs:annotation>
-            <xs:documentation>start date/time of event</xs:documentation>
+            <xs:documentation>A password</xs:documentation>
           </xs:annotation>
         </xs:attribute>
-        <xs:attribute xmlns="http://www.mulesoft.org/schema/mule/google-calendar" name="endDate" use="required" type="dateTimeType">
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/google-calendar" xmlns:mule="http://www.mulesoft.org/schema/mule/core" name="update-event" substitutionGroup="mule:abstract-message-processor" type="UpdateEventType">
+    <xs:annotation>
+      <xs:documentation>updateEvent processor</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:complexType name="UpdateEventType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+        <xs:sequence>
+          <xs:element name="calendar-event" maxOccurs="1" minOccurs="1">
+            <xs:annotation>
+              <xs:documentation>calendarEvent to be processed</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:extension xmlns="http://www.mulesoft.org/schema/mule/google-calendar" base="CalendarEventObjectType"></xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute name="config-ref" use="optional" type="xs:string">
           <xs:annotation>
-            <xs:documentation>end date/time of event</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute name="timeZone" use="required" type="xs:string">
-          <xs:annotation>
-            <xs:documentation>timeZone of event</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute name="summary" use="required" type="xs:string">
-          <xs:annotation>
-            <xs:documentation>summary of event</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute name="description" use="required" type="xs:string">
-          <xs:annotation>
-            <xs:documentation>description of event</xs:documentation>
-          </xs:annotation>
-        </xs:attribute>
-        <xs:attribute name="location" use="required" type="xs:string">
-          <xs:annotation>
-            <xs:documentation>location of event</xs:documentation>
+            <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
           </xs:annotation>
         </xs:attribute>
         <xs:attribute name="username" use="optional" type="xs:string">
@@ -190,6 +223,75 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/google-calendar" xmlns:mule="http://www.mulesoft.org/schema/mule/core" name="find-events" substitutionGroup="mule:abstract-message-processor" type="FindEventsType">
+    <xs:annotation>
+      <xs:documentation>findEvents processor</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:complexType name="FindEventsType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+        <xs:sequence>
+          <xs:element name="calendar-event" maxOccurs="1" minOccurs="1">
+            <xs:annotation>
+              <xs:documentation>calendarEvent search values</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:extension xmlns="http://www.mulesoft.org/schema/mule/google-calendar" base="CalendarEventObjectType"></xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute name="config-ref" use="optional" type="xs:string">
+          <xs:annotation>
+            <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="username" use="optional" type="xs:string">
+          <xs:annotation>
+            <xs:documentation>A username</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="password" use="optional" type="xs:string">
+          <xs:annotation>
+            <xs:documentation>A password</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/google-calendar" xmlns:mule="http://www.mulesoft.org/schema/mule/core" name="clear-calendar" substitutionGroup="mule:abstract-message-processor" type="ClearCalendarType">
+    <xs:annotation>
+      <xs:documentation>clearCalendar processor</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:complexType name="ClearCalendarType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+        <xs:attribute name="config-ref" use="optional" type="xs:string">
+          <xs:annotation>
+            <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="calendarId" use="required" type="xs:string">
+          <xs:annotation>
+            <xs:documentation>calendarId of calendar</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="username" use="optional" type="xs:string">
+          <xs:annotation>
+            <xs:documentation>A username</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="password" use="optional" type="xs:string">
+          <xs:annotation>
+            <xs:documentation>A password</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
   <xs:element xmlns="http://www.mulesoft.org/schema/mule/google-calendar" xmlns:mule="http://www.mulesoft.org/schema/mule/core" name="delete-calendar" substitutionGroup="mule:abstract-message-processor" type="DeleteCalendarType">
     <xs:annotation>
       <xs:documentation>deleteCalendar processor</xs:documentation>
@@ -206,6 +308,44 @@
         <xs:attribute name="calendarId" use="required" type="xs:string">
           <xs:annotation>
             <xs:documentation>calendarId of calendar</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="username" use="optional" type="xs:string">
+          <xs:annotation>
+            <xs:documentation>A username</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="password" use="optional" type="xs:string">
+          <xs:annotation>
+            <xs:documentation>A password</xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element xmlns="http://www.mulesoft.org/schema/mule/google-calendar" xmlns:mule="http://www.mulesoft.org/schema/mule/core" name="delete-event" substitutionGroup="mule:abstract-message-processor" type="DeleteEventType">
+    <xs:annotation>
+      <xs:documentation>deleteEvent processor</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+  <xs:complexType name="DeleteEventType">
+    <xs:complexContent>
+      <xs:extension xmlns:mule="http://www.mulesoft.org/schema/mule/core" base="mule:abstractMessageProcessorType">
+        <xs:sequence>
+          <xs:element name="calendar-event" maxOccurs="1" minOccurs="1">
+            <xs:annotation>
+              <xs:documentation>calendarEvent of calendar</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:extension xmlns="http://www.mulesoft.org/schema/mule/google-calendar" base="CalendarEventObjectType"></xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute name="config-ref" use="optional" type="xs:string">
+          <xs:annotation>
+            <xs:documentation>Specify which configuration to use for this invocation.</xs:documentation>
           </xs:annotation>
         </xs:attribute>
         <xs:attribute name="username" use="optional" type="xs:string">

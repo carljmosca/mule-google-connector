@@ -1,6 +1,5 @@
 <!-- BEGIN_INCLUDE(google-calendar:create-event) -->
-	<google-calendar:create-event  >
-     </google-calendar:create-event>
+	<google-calendar:create-event  />
 <!-- END_INCLUDE(google-calendar:create-event) -->
 <!-- BEGIN_INCLUDE(google-calendar:update-event) -->
 	<google-calendar:update-event>
