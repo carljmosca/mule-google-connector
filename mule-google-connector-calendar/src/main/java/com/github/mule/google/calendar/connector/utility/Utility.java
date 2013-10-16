@@ -6,8 +6,6 @@ import java.util.Date;
 
 import org.apache.log4j.Logger;
 
-import com.google.api.client.util.DateTime;
-
 public class Utility {
 	
 	private static Logger LOGGER = Logger.getLogger(Utility.class);
@@ -38,4 +36,5 @@ public class Utility {
 		}
 		return result;
 	}
+
 }

@@ -9,12 +9,14 @@ import java.util.List;
 import org.junit.Test;
 
 import com.github.mule.google.calendar.connector.utility.Utility;
-import com.github.mule.google.wrapper.Calendar;
-import com.github.mule.google.wrapper.CalendarEvent;
-import com.github.mule.google.wrapper.OperationResult;
+import com.github.mule.google.wrapper.CalendarEventRequest;
+import com.github.mule.google.wrapper.CalendarRequest;
+import com.github.mule.google.wrapper.CalendarResponse;
 
 public class CalendarManagerTest {
 
+	private final String TEST_CALENDAR_NAME = "Test Calendar";
+	
 	@Test
 	public void testCalendarManager() {
 		// fail("Not yet implemented");
@@ -22,19 +24,21 @@ public class CalendarManagerTest {
 
 	@Test
 	public void testCreateEvent() throws ParseException {
-		OperationResult result = new OperationResult();
+		CalendarResponse result = new CalendarResponse();
 		CalendarManager calendarManager = new CalendarManager();
 		String calendarId = "";
-		result = calendarManager.createCalendar("Test Calendar");
+		CalendarRequest calendarRequest = new CalendarRequest();
+		calendarRequest.setSummary(TEST_CALENDAR_NAME);
+		result = calendarManager.createCalendar(calendarRequest);
 		if (!result.isSuccess()) {
 			System.out.println("could not create Test Calendar");
 		} else {
-			calendarId = result.getId();
-			result = calendarManager.calendarExists(result.getId());
+			calendarId = result.getCalendarId();
+			result = calendarManager.calendarExists(result.getCalendarId());
 		}
 		if (result.isSuccess()) {
 			try {
-				CalendarEvent calendarEvent = new CalendarEvent();
+				CalendarEventRequest calendarEvent = new CalendarEventRequest();
 				calendarEvent.setCalendarId(calendarId);
 				calendarEvent.setStart(java.util.Calendar.getInstance());
 				calendarEvent.setEnd(java.util.Calendar.getInstance());
@@ -57,9 +61,11 @@ public class CalendarManagerTest {
 
 	@Test
 	public void testClearCalendar() {
-		OperationResult result = new OperationResult();
+		CalendarResponse result = new CalendarResponse();
 		CalendarManager calendarManager = new CalendarManager();
-		Calendar calendar = calendarManager.findCalendar("Test Calendar");
+		CalendarRequest calendarRequest = new CalendarRequest();
+		calendarRequest.setSummary(TEST_CALENDAR_NAME);
+		CalendarRequest calendar = calendarManager.findCalendar(calendarRequest);
 		if (calendar != null)
 			result = calendarManager.clearCalendar(calendar.getId());
 		System.out.println("clearCalendar: " + result.getMessage());
@@ -75,9 +81,11 @@ public class CalendarManagerTest {
 	public void testRemoveTestCalendars() {
 		CalendarManager calendarManager = new CalendarManager();
 		while (true) {
-			Calendar calendar = calendarManager.findCalendar("Test Calendar");
+			CalendarRequest calendarRequest = new CalendarRequest();
+			calendarRequest.setSummary(TEST_CALENDAR_NAME);
+			CalendarRequest calendar = calendarManager.findCalendar(calendarRequest);
 			if (calendar != null && calendar.getId() != null) {
-				OperationResult result = calendarManager
+				CalendarResponse result = calendarManager
 						.deleteCalendar(calendar.getId());
 				if (!result.isSuccess())
 					break;

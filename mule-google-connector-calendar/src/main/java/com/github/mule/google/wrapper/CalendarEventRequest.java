@@ -1,23 +1,22 @@
 package com.github.mule.google.wrapper;
 
 import java.io.Serializable;
-import java.util.List;
+import java.util.Calendar;
 
 import org.mule.api.annotations.param.Optional;
 
-public class CalendarEvent implements Serializable {
+public class CalendarEventRequest implements Serializable {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 4697962219105356828L;
 	
-
-	private String calendarId;
-	private String eventId;
-	private String summary;
+	private String calendarId = "";
+	private String eventId = "";
+	private String summary = "";
 	@Optional
-	private String description;
+	private String description = "";
 	private java.util.Calendar start;
 	private java.util.Calendar end;
 	@Optional
@@ -25,8 +24,25 @@ public class CalendarEvent implements Serializable {
 //	@Optional
 //	private List<Attendee> attendees;
 	
-	public CalendarEvent() {
+	public CalendarEventRequest() {
 	}
+	
+	
+
+	public CalendarEventRequest(String calendarId, String eventId,
+			String summary, String description, Calendar start, Calendar end,
+			String location) {
+		super();
+		this.calendarId = calendarId;
+		this.eventId = eventId;
+		this.summary = summary;
+		this.description = description;
+		this.start = start;
+		this.end = end;
+		this.location = location;
+	}
+
+
 
 	public String getCalendarId() {
 		return calendarId;

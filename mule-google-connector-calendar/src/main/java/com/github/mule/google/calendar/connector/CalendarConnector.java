@@ -1,6 +1,5 @@
 package com.github.mule.google.calendar.connector;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -15,9 +14,9 @@ import org.mule.api.annotations.param.ConnectionKey;
 import org.mule.api.annotations.param.Default;
 import org.mule.api.annotations.param.Optional;
 
-import com.github.mule.google.wrapper.Calendar;
-import com.github.mule.google.wrapper.CalendarEvent;
-import com.github.mule.google.wrapper.OperationResult;
+import com.github.mule.google.wrapper.CalendarEventRequest;
+import com.github.mule.google.wrapper.CalendarRequest;
+import com.github.mule.google.wrapper.CalendarResponse;
 import com.google.api.services.calendar.model.Event;
 
 /**
@@ -85,7 +84,7 @@ public class CalendarConnector {
 	 * @return operationResult
 	 */
 	@Processor
-	public OperationResult createEvent(@Optional @Default("#[payload]")CalendarEvent calendarEvent) {
+	public CalendarResponse createEvent(@Optional @Default("#[payload]")CalendarEventRequest calendarEvent) {
 		CalendarManager manager = new CalendarManager();
 		return manager.createEvent(calendarEvent);
 	}
@@ -95,15 +94,36 @@ public class CalendarConnector {
 	 * 
 	 * {@sample.xml ../../../doc/Calendar-connector.xml.sample google-calendar:update-event}
 	 * 
-	 * @param calendarEvent
-	 *            calendarEvent to be processed
+	 * @param calendarRequest
+	 *            calendarRequest to be processed
+	 * @param createIFNotFound
+	 * 			  createIfNotFound calendar if not found           
 	 * @return string
 	 * */
 	@Processor
-	public OperationResult updateEvent(CalendarEvent calendarEvent) {
+	public CalendarResponse updateCalendar(CalendarRequest calendarRequest, boolean createIfNotFound) {
 		CalendarManager manager = new CalendarManager();
-		OperationResult result = manager.updateEvent(calendarEvent);
-		LOGGER.debug("updateEvent: " + calendarEvent.getCalendarId());
+		CalendarResponse result = manager.updateCalendar(calendarRequest, createIfNotFound);
+		LOGGER.debug("updateCalendar: " + calendarRequest.getId() + " " + calendarRequest.getSummary() + " " + calendarRequest.getDescription());
+		return result;
+	}
+	
+	/**
+	 * updateEvent processor
+	 * 
+	 * {@sample.xml ../../../doc/Calendar-connector.xml.sample google-calendar:update-event}
+	 * 
+	 * @param calendarEventRequest
+	 *            calendarEvent to be processed
+	 * @param createIFNotFound
+	 * 			  createIfNotFound calendar if not found           
+	 * @return string
+	 * */
+	@Processor
+	public CalendarResponse updateEvent(CalendarEventRequest calendarEventRequest, boolean createIfNotFound) {
+		CalendarManager manager = new CalendarManager();
+		CalendarResponse result = manager.updateEvent(calendarEventRequest, createIfNotFound);
+		LOGGER.debug("updateEvent: " + calendarEventRequest.getCalendarId() + " " + calendarEventRequest.getSummary() + " " + calendarEventRequest.getDescription());
 		return result;
 	}
 
@@ -112,14 +132,14 @@ public class CalendarConnector {
 	 * 
 	 * {@sample.xml ../../../doc/Calendar-connector.xml.sample google-calendar:create-calendar}
 	 * 
-	 * @param summary
-	 *            summary (name) of calendar
+	 * @param calendarRequest
+	 *            calendarRequest object
 	 * @return string
 	 * */
 	@Processor
-	public OperationResult createCalendar(String summary) {
+	public CalendarResponse createCalendar(CalendarRequest calendarRequest) {
 		CalendarManager manager = new CalendarManager();
-		return manager.createCalendar(summary);
+		return manager.createCalendar(calendarRequest);
 	}
 
 	/**
@@ -127,14 +147,29 @@ public class CalendarConnector {
 	 * 
 	 * {@sample.xml ../../../doc/Calendar-connector.xml.sample google-calendar:find-calendar}
 	 * 
-	 * @param summary
-	 *            summary (name) of calendar
-	 * @return operationResult
+	 * @param calendarRequest
+	 *            calendar to find
+	 * @return calendarRequest
 	 * */
 	@Processor
-	public Calendar findCalendar(String summary) {
+	public CalendarRequest findCalendar(CalendarRequest calendarRequest) {
 		CalendarManager manager = new CalendarManager();
-		return manager.findCalendar(summary);
+		return manager.findCalendar(calendarRequest);
+	}
+	
+	/**
+	 * findCalendars processor
+	 * 
+	 * {@sample.xml ../../../doc/Calendar-connector.xml.sample google-calendar:find-calendar}
+	 * 
+	 * @param calendarRequest
+	 *            calendar to find
+	 * @return calendarRequest
+	 * */
+	@Processor
+	public List<CalendarRequest> findCalendars(CalendarRequest calendarRequest) {
+		CalendarManager manager = new CalendarManager();
+		return manager.findCalendars(calendarRequest);
 	}
 	
 	/**
@@ -147,10 +182,9 @@ public class CalendarConnector {
 	 * @return list of events
 	 */
 	@Processor
-	public List<Event> findEvents(CalendarEvent calendarEvent) {
-		List<Event> result = new ArrayList<Event>(0);
+	public List<Event> findEvents(CalendarEventRequest calendarEvent) {
 		CalendarManager manager = new CalendarManager();
-		return manager.searchEvent(calendarEvent);
+		return manager.findEvents(calendarEvent);
 	}
 
 	/**
@@ -163,7 +197,7 @@ public class CalendarConnector {
 	 * @return boolean
 	 * */
 	@Processor
-	public OperationResult clearCalendar(String calendarId) {
+	public CalendarResponse clearCalendar(String calendarId) {
 		CalendarManager manager = new CalendarManager();
 		return manager.clearCalendar(calendarId);
 	}
@@ -178,7 +212,7 @@ public class CalendarConnector {
 	 * @return boolean
 	 * */
 	@Processor
-	public OperationResult deleteCalendar(String calendarId) {
+	public CalendarResponse deleteCalendar(String calendarId) {
 		CalendarManager manager = new CalendarManager();
 		return manager.deleteCalendar(calendarId);
 	}
@@ -193,7 +227,7 @@ public class CalendarConnector {
 	 * @return boolean
 	 * */
 	@Processor
-	public OperationResult deleteEvent(CalendarEvent calendarEvent) {
+	public CalendarResponse deleteEvent(CalendarEventRequest calendarEvent) {
 		CalendarManager manager = new CalendarManager();
 		return manager.deleteEvent(calendarEvent);
 	}

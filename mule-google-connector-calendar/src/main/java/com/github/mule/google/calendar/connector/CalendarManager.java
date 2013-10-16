@@ -8,12 +8,13 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.github.mule.google.calendar.connector.utility.Utility;
-import com.github.mule.google.wrapper.Attendee;
-import com.github.mule.google.wrapper.CalendarEvent;
-import com.github.mule.google.wrapper.OperationResult;
+import com.github.mule.google.wrapper.CalendarEventRequest;
+import com.github.mule.google.wrapper.CalendarRequest;
+import com.github.mule.google.wrapper.CalendarResponse;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
@@ -30,7 +31,6 @@ import com.google.api.services.calendar.model.Calendar;
 import com.google.api.services.calendar.model.CalendarList;
 import com.google.api.services.calendar.model.CalendarListEntry;
 import com.google.api.services.calendar.model.Event;
-import com.google.api.services.calendar.model.EventAttendee;
 import com.google.api.services.calendar.model.EventDateTime;
 import com.google.api.services.calendar.model.Events;
 
@@ -75,8 +75,8 @@ public class CalendarManager {
 	 * @param calendarEvent
 	 * @return
 	 */
-	public OperationResult createEvent(CalendarEvent calendarEvent) {
-		OperationResult result = new OperationResult();
+	public CalendarResponse createEvent(CalendarEventRequest calendarEvent) {
+		CalendarResponse result = new CalendarResponse();
 		Calendar calendar = null;
 		try {
 			calendar = getCalendar(calendarEvent.getCalendarId());
@@ -95,28 +95,28 @@ public class CalendarManager {
 
 	/**
 	 * 
-	 * @param calendarEvent
+	 * @param calendarEventRequest
 	 * @return
 	 */
-	public OperationResult updateEvent(CalendarEvent calendarEvent) {
-		OperationResult result = new OperationResult();
+	public CalendarResponse updateEvent(CalendarEventRequest calendarEventRequest, boolean createIfNotFound) {
+		CalendarResponse result = new CalendarResponse();
 		Calendar calendar = null;
 		Event event = null;
 		try {
 			Event originalEvent = getCalendarEvent(
-					calendarEvent.getCalendarId(), calendarEvent.getEventId());
+					calendarEventRequest.getCalendarId(), calendarEventRequest.getEventId());
 			if (originalEvent != null) {
-				calendar = getCalendar(calendarEvent.getCalendarId());
+				calendar = getCalendar(calendarEventRequest.getCalendarId());
 
 				if (calendar != null) {
-					event = addEvent(calendarEvent);
-					result.setId(event.getId());
+					event = addEvent(calendarEventRequest);
+					result.setEventId(event.getId());
 					result.setSuccess(event != null);
 					if (result.isSuccess()) {
-						deleteEvent(calendarEvent);
+						deleteEvent(calendarEventRequest);
 					}
 				} else {
-					LOGGER.debug("Could not getCalendar: " + calendarEvent.toString());
+					LOGGER.debug("Could not getCalendar: " + calendarEventRequest.toString());
 				}
 			}
 		} catch (Exception e) {
@@ -126,11 +126,16 @@ public class CalendarManager {
 		return result;
 	}
 
-	public OperationResult createCalendar(String calendarSummary) {
-		OperationResult result = new OperationResult();
-		try {
-			Calendar calendar = addCalendar(calendarSummary);
-			result.setId(calendar.getId());
+	public CalendarResponse createCalendar(CalendarRequest calendarRequest) {
+		CalendarResponse result = new CalendarResponse();
+		try {			
+			Calendar entry = new Calendar();
+			entry.setSummary(calendarRequest.getSummary());
+			if (calendarRequest.getSummary() != null) {
+				entry.setDescription(calendarRequest.getDescription());
+			}
+			entry = client.calendars().insert(entry).execute();			
+			result.setCalendarId(entry.getId());
 			result.setSuccess(true);
 		} catch (IOException e) {
 			LOGGER.error(e);
@@ -138,9 +143,52 @@ public class CalendarManager {
 		}
 		return result;
 	}
+	
+	public CalendarResponse updateCalendar(CalendarRequest calendarRequest, boolean createIfNotFound) {
+		CalendarResponse result = new CalendarResponse();
+		CalendarRequest calendar = findCalendar(calendarRequest);
+		if (calendar != null) {
+			
+		}
+		return result;
+	}
+	
+	
+	public CalendarResponse _updateCalendar(CalendarRequest calendarRequest) {
+		
+		CalendarResponse response = new CalendarResponse();
+		response.setSuccess(false);
+		Calendar calendar = null;
+		
+		if (!StringUtils.isEmpty(calendarRequest.getId())) {
+			try {
+			calendar = client.calendars().get(calendarRequest.getId()).execute();
+			if (calendar == null) {
+				response.setMessage("Could not find calendar with id: " + calendarRequest.getId());
+			}
+			} catch (IOException e) {
+				response.setMessage(e.getMessage());
+			}
+		} else {
+			response.setMessage("id is required to update calendar");
+		}
+		if (calendar != null) {
+			try {			
+				calendar.setSummary(calendarRequest.getSummary());
+				calendar.setDescription(calendarRequest.getDescription());
+				client.calendars().update(calendar.getId(), calendar).execute();
+				response.setCalendarId(calendar.getId());
+				response.setSuccess(true);
+			} catch (IOException e) {
+				LOGGER.error(e);
+				response.setMessage(e.getMessage());
+			}
+		}
+		return response;
+	}
 
-	public OperationResult deleteCalendar(String calendarId) {
-		OperationResult result = new OperationResult();
+	public CalendarResponse deleteCalendar(String calendarId) {
+		CalendarResponse result = new CalendarResponse();
 		try {
 			client.calendars().delete(calendarId).execute();
 			result.setSuccess(true);
@@ -151,8 +199,8 @@ public class CalendarManager {
 		return result;
 	}
 
-	public OperationResult deleteEvent(CalendarEvent calendarEvent) {
-		OperationResult result = new OperationResult();
+	public CalendarResponse deleteEvent(CalendarEventRequest calendarEvent) {
+		CalendarResponse result = new CalendarResponse();
 		try {
 			List<Event> events = getCalendarEvents(calendarEvent
 					.getCalendarId());
@@ -171,8 +219,8 @@ public class CalendarManager {
 		return result;
 	}
 
-	public OperationResult clearCalendar(String calendarId) {
-		OperationResult result = new OperationResult();
+	public CalendarResponse clearCalendar(String calendarId) {
+		CalendarResponse result = new CalendarResponse();
 		try {
 			List<Event> events = getCalendarEvents(calendarId);
 			for (Event event : events) {
@@ -216,8 +264,8 @@ public class CalendarManager {
 		return null;
 	}
 
-	public OperationResult calendarExists(String calendarId) {
-		OperationResult result = new OperationResult();
+	public CalendarResponse calendarExists(String calendarId) {
+		CalendarResponse result = new CalendarResponse();
 		try {
 			Calendar calendar = getCalendar(calendarId);
 			result.setSuccess(calendar != null);
@@ -228,21 +276,25 @@ public class CalendarManager {
 		return result;
 	}
 
-	private static Calendar addCalendar(String calendarSummary)
-			throws IOException {
-		Calendar entry = new Calendar();
-		entry.setSummary(calendarSummary);
-		Calendar result = client.calendars().insert(entry).execute();
-		return result;
-	}
-
 	private static Calendar getCalendar(String calendarId) throws IOException {
 		Calendar result = client.calendars().get(calendarId).execute();
 		return result;
 	}
 
-	public com.github.mule.google.wrapper.Calendar findCalendar(String summary) {
-		com.github.mule.google.wrapper.Calendar result = null;
+	public com.github.mule.google.wrapper.CalendarRequest findCalendar(CalendarRequest calendarRequest) {
+		List<com.github.mule.google.wrapper.CalendarRequest> list = _findCalendars(calendarRequest, true);
+		if (list.size() == 0) {
+			return null;
+		}
+		return list.get(0);
+	}
+	
+	public List<com.github.mule.google.wrapper.CalendarRequest> findCalendars(CalendarRequest calendarRequest) {
+		return _findCalendars(calendarRequest, false);
+	}
+
+	public List<com.github.mule.google.wrapper.CalendarRequest> _findCalendars(CalendarRequest calendarRequest, boolean firstOnly) {
+		List<com.github.mule.google.wrapper.CalendarRequest> list = new ArrayList<com.github.mule.google.wrapper.CalendarRequest>(0);
 		String pageToken = null;
 		do {
 			CalendarList calendarList = null;
@@ -250,28 +302,38 @@ public class CalendarManager {
 				calendarList = client.calendarList().list()
 						.setPageToken(pageToken).execute();
 			} catch (IOException e) {
-			}
+			}			
 			List<CalendarListEntry> items = calendarList.getItems();
-
 			for (CalendarListEntry calendarListEntry : items) {
-				if (calendarListEntry.getSummary().equals(summary)) {
-					result = new com.github.mule.google.wrapper.Calendar();
-					result.setId(calendarListEntry.getId());
-					result.setDescription(calendarListEntry.getDescription());
-					result.setSummary(calendarListEntry.getSummary());
-					return result;
+				if (!StringUtils.isEmpty(calendarRequest.getId())) {
+					if (calendarListEntry.getId().equals(calendarRequest.getId())) {
+						list.add(new CalendarRequest(
+								calendarListEntry.getId(),
+								calendarListEntry.getSummary(),
+								calendarListEntry.getDescription()));
+					}					
+				} else if (calendarListEntry.getSummary().equals(calendarRequest.getSummary())
+						&& calendarListEntry.getDescription().equals(calendarRequest.getDescription())
+						) {
+					list.add(new CalendarRequest(
+							calendarListEntry.getId(),
+							calendarListEntry.getSummary(),
+							calendarListEntry.getDescription()));
+				}
+				if (firstOnly && list.size() > 0) {
+					return list;
 				}
 			}
 			pageToken = calendarList.getNextPageToken();
 		} while (pageToken != null);
-		return result;
+		return list;
 	}
 
-	public List<Event> searchEvent(CalendarEvent calendarEvent) {
-		return searchEvent(calendarEvent, "yyyy-MM-dd HH:mm:ss");
+	public List<Event> findEvents(CalendarEventRequest calendarEvent) {
+		return findEvents(calendarEvent, "yyyy-MM-dd HH:mm:ss");
 	}
 
-	public List<Event> searchEvent(CalendarEvent calendarEvent,
+	public List<Event> findEvents(CalendarEventRequest calendarEvent,
 			String dateFormat) {
 		List<Event> result = new ArrayList<Event>(0);
 		List<Event> events = getCalendarEvents(calendarEvent.getCalendarId());
@@ -310,7 +372,7 @@ public class CalendarManager {
 		return result;
 	}
 
-	private static Event addEvent(CalendarEvent calendarEvent)
+	private static Event addEvent(CalendarEventRequest calendarEvent)
 			throws IOException {
 		Event event = newEvent(calendarEvent.getStart(), calendarEvent.getEnd());
 		event.setSummary(calendarEvent.getSummary());
