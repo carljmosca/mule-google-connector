@@ -2,20 +2,21 @@
 	<google-calendar:create-event  />
 <!-- END_INCLUDE(google-calendar:create-event) -->
 <!-- BEGIN_INCLUDE(google-calendar:update-event) -->
-	<google-calendar:update-event>
-		<google-calendar:calendar-event/>
-     </google-calendar:update-event>
+	<google-calendar:update-event createIfNotFound="false"/>
 <!-- END_INCLUDE(google-calendar:update-event) -->
+<!-- BEGIN_INCLUDE(google-calendar:update-calendar) -->
+	<google-calendar:update-calendar createIfNotFound="false"/>
+<!-- END_INCLUDE(google-calendar:update-calendar) -->
 <!-- BEGIN_INCLUDE(google-calendar:find-events) -->
 	<google-calendar:find-events>
 		<google-calendar:calendar-event/>
     </google-calendar:find-events>
 <!-- END_INCLUDE(google-calendar:find-events) -->
 <!-- BEGIN_INCLUDE(google-calendar:create-calendar) -->
-    <google-calendar:create-calendar summary="#[map-payload:content]" />
+    <google-calendar:create-calendar />
 <!-- END_INCLUDE(google-calendar:create-calendar) -->
 <!-- BEGIN_INCLUDE(google-calendar:find-calendar) -->
-    <google-calendar:find-calendar summary="#[map-payload:content]" />
+    <google-calendar:find-calendar />
 <!-- END_INCLUDE(google-calendar:find-calendar) -->
 <!-- BEGIN_INCLUDE(google-calendar:delete-calendar) -->
     <google-calendar:delete-calendar calendarId="#[map-payload:content]" />

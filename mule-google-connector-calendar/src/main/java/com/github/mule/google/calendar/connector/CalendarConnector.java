@@ -96,12 +96,12 @@ public class CalendarConnector {
 	 * 
 	 * @param calendarRequest
 	 *            calendarRequest to be processed
-	 * @param createIFNotFound
+	 * @param createIfNotFound
 	 * 			  createIfNotFound calendar if not found           
 	 * @return string
 	 * */
 	@Processor
-	public CalendarResponse updateCalendar(CalendarRequest calendarRequest, boolean createIfNotFound) {
+	public CalendarResponse updateCalendar(@Optional @Default("#[payload]") CalendarRequest calendarRequest, boolean createIfNotFound) {
 		CalendarManager manager = new CalendarManager();
 		CalendarResponse result = manager.updateCalendar(calendarRequest, createIfNotFound);
 		LOGGER.debug("updateCalendar: " + calendarRequest.getId() + " " + calendarRequest.getSummary() + " " + calendarRequest.getDescription());
@@ -115,12 +115,12 @@ public class CalendarConnector {
 	 * 
 	 * @param calendarEventRequest
 	 *            calendarEvent to be processed
-	 * @param createIFNotFound
+	 * @param createIfNotFound
 	 * 			  createIfNotFound calendar if not found           
 	 * @return string
 	 * */
 	@Processor
-	public CalendarResponse updateEvent(CalendarEventRequest calendarEventRequest, boolean createIfNotFound) {
+	public CalendarResponse updateEvent(@Optional @Default("#[payload]") CalendarEventRequest calendarEventRequest, boolean createIfNotFound) {
 		CalendarManager manager = new CalendarManager();
 		CalendarResponse result = manager.updateEvent(calendarEventRequest, createIfNotFound);
 		LOGGER.debug("updateEvent: " + calendarEventRequest.getCalendarId() + " " + calendarEventRequest.getSummary() + " " + calendarEventRequest.getDescription());
@@ -137,7 +137,7 @@ public class CalendarConnector {
 	 * @return string
 	 * */
 	@Processor
-	public CalendarResponse createCalendar(CalendarRequest calendarRequest) {
+	public CalendarResponse createCalendar(@Optional @Default("#[payload]") CalendarRequest calendarRequest) {
 		CalendarManager manager = new CalendarManager();
 		return manager.createCalendar(calendarRequest);
 	}
@@ -152,7 +152,7 @@ public class CalendarConnector {
 	 * @return calendarRequest
 	 * */
 	@Processor
-	public CalendarRequest findCalendar(CalendarRequest calendarRequest) {
+	public CalendarRequest findCalendar(@Optional @Default("#[payload]") CalendarRequest calendarRequest) {
 		CalendarManager manager = new CalendarManager();
 		return manager.findCalendar(calendarRequest);
 	}
