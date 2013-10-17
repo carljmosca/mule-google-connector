@@ -113,17 +113,17 @@ public class CalendarConnector {
 	 * 
 	 * {@sample.xml ../../../doc/Calendar-connector.xml.sample google-calendar:update-event}
 	 * 
-	 * @param calendarEventRequest
-	 *            calendarEvent to be processed
+	 * @param calendarRequest
+	 *            calendar to be processed
 	 * @param createIfNotFound
 	 * 			  createIfNotFound calendar if not found           
 	 * @return string
 	 * */
 	@Processor
-	public CalendarResponse updateEvent(@Optional @Default("#[payload]") CalendarEventRequest calendarEventRequest, boolean createIfNotFound) {
+	public CalendarResponse updateEvent(@Optional @Default("#[payload]") CalendarRequest calendarRequest, boolean createIfNotFound) {
 		CalendarManager manager = new CalendarManager();
-		CalendarResponse result = manager.updateEvent(calendarEventRequest, createIfNotFound);
-		LOGGER.debug("updateEvent: " + calendarEventRequest.getCalendarId() + " " + calendarEventRequest.getSummary() + " " + calendarEventRequest.getDescription());
+		CalendarResponse result = manager.updateEvent(calendarRequest, createIfNotFound);
+		LOGGER.debug("updateEvent: " + calendarRequest.getId() + " " + calendarRequest.getSummary() + " " + calendarRequest.getDescription());
 		return result;
 	}
 

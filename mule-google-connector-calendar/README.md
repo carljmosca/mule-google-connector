@@ -17,6 +17,8 @@ BUILDING
 
 from the command line: mvn clean package -Ddevkit.studio.package.skip=false
 
+if you don't have a Google account configured and need or want to build without testing: mvn clean package -Ddevkit.studio.package.skip=false -DskipTests
+
 TESTING
 =======
 

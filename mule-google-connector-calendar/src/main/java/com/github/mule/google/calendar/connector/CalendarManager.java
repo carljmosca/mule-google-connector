@@ -98,25 +98,25 @@ public class CalendarManager {
 	 * @param calendarEventRequest
 	 * @return
 	 */
-	public CalendarResponse updateEvent(CalendarEventRequest calendarEventRequest, boolean createIfNotFound) {
+	public CalendarResponse updateEvent(CalendarRequest calendarRequest, boolean createIfNotFound) {
 		CalendarResponse result = new CalendarResponse();
 		Calendar calendar = null;
 		Event event = null;
 		try {
 			Event originalEvent = getCalendarEvent(
-					calendarEventRequest.getCalendarId(), calendarEventRequest.getEventId());
-			if (originalEvent != null) {
-				calendar = getCalendar(calendarEventRequest.getCalendarId());
+					calendarRequest.getId(), calendarRequest.getCalendarEventRequest().getEventId());
+			if (originalEvent != null || createIfNotFound) {
+				calendar = getCalendar(calendarRequest.getId());
 
 				if (calendar != null) {
-					event = addEvent(calendarEventRequest);
+					event = addEvent(calendarRequest.getCalendarEventRequest());
 					result.setEventId(event.getId());
 					result.setSuccess(event != null);
-					if (result.isSuccess()) {
-						deleteEvent(calendarEventRequest);
+					if (result.isSuccess() && originalEvent != null) {
+						deleteEvent(calendarRequest.getCalendarEventRequest());
 					}
 				} else {
-					LOGGER.debug("Could not getCalendar: " + calendarEventRequest.toString());
+					LOGGER.debug("Could not getCalendar: " + calendarRequest.toString());
 				}
 			}
 		} catch (Exception e) {
