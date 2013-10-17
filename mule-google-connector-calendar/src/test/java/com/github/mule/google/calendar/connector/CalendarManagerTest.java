@@ -4,6 +4,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import org.junit.Test;
@@ -20,7 +21,8 @@ public class CalendarManagerTest {
 	
 	@Test
 	public void testCalendarManager() {
-		// fail("Not yet implemented");
+		CalendarManager calendarManager = new CalendarManager();
+		assertTrue(calendarManager != null);
 	}
 
 	@Test
@@ -58,6 +60,21 @@ public class CalendarManagerTest {
 			}
 		}
 		assertTrue(!result.isSuccess());
+	}
+	
+	@Test
+	public void testUpdateEvent() {
+		CalendarManager calendarManager = new CalendarManager();
+		CalendarRequest calendarRequest = new CalendarRequest();
+		calendarRequest.setSummary(TEST_CALENDAR_NAME);
+		calendarRequest.setDescription(TEST_CALENDAR_DESCRIPTION);
+		calendarRequest.getCalendarEventRequest().setSummary("event");
+		calendarRequest.getCalendarEventRequest().setDescription("interesting description");
+		calendarRequest.getCalendarEventRequest().setLocation("my location");
+		calendarRequest.getCalendarEventRequest().setStart(Calendar.getInstance());
+		calendarRequest.getCalendarEventRequest().setEnd(Calendar.getInstance());		
+		CalendarResponse response = calendarManager.updateEvent(calendarRequest, true);
+		assertTrue(response.isSuccess());
 	}
 
 	@Test

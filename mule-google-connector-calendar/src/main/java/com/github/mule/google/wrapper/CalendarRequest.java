@@ -12,7 +12,7 @@ public class CalendarRequest implements Serializable {
 	private String id = "";
 	private String summary = "";
 	private String description = "";
-	private CalendarEventRequest calendarEventRequest;
+	private CalendarEventRequest calendarEventRequest = new CalendarEventRequest();;
 		
 	public CalendarRequest() {
 
