@@ -118,8 +118,14 @@ public class CalendarManager {
 			} else {
 				calendarRequest.setId(existingCalendar.getId());
 			}
-			Event originalEvent = getCalendarEvent(
-					calendarRequest.getId(), calendarRequest.getCalendarEventRequest().getEventId());
+			Event originalEvent = null;
+			if (!StringUtils.isEmpty(calendarRequest.getCalendarEventRequest().getEventId())) {
+				originalEvent = getCalendarEvent(calendarRequest.getId(), calendarRequest.getCalendarEventRequest().getEventId());
+			} else {
+				List<Event> events = findEvents(calendarRequest.getCalendarEventRequest());
+				if (events.size() > 0)
+					originalEvent = events.get(0);
+			}
 			if (originalEvent != null || createIfNotFound) {
 				calendar = getCalendar(calendarRequest.getId());
 				if (calendar != null) {
@@ -152,13 +158,14 @@ public class CalendarManager {
 		CalendarResponse result = new CalendarResponse();
 		try {			
 			Calendar entry = new Calendar();
+			entry.setSummary(calendarRequest.getSummary());
 			if (calendarRequest.getDescription() != null) {
 				entry.setDescription(calendarRequest.getDescription());
 			}
 			entry = client.calendars().insert(entry).execute();			
 			result.setCalendarId(entry.getId());
-			result.setSuccess(setCalendarAccess(entry.getId()).isSuccess());
-			
+			result.setSuccess(true);
+			//result.setSuccess(setCalendarAccess(entry.getId()).isSuccess());			
 		} catch (IOException e) {
 			LOGGER.error(e);
 			result.setMessage(e.getMessage());
@@ -262,7 +269,7 @@ public class CalendarManager {
 	public CalendarResponse deleteEvent(CalendarRequest calendarRequest) {
 		CalendarResponse result = new CalendarResponse();
 		try {
-			List<Event> events = getCalendarEvents(calendarRequest.getId());
+			List<Event> events = findEvents(calendarRequest.getCalendarEventRequest());
 			for (Event event : events) {
 				if (calendarRequest.getCalendarEventRequest().getEventId().equals(event.getId())) {
 					client.events()
