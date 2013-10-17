@@ -23,7 +23,7 @@
 <!-- END_INCLUDE(google-calendar:delete-calendar) -->
 <!-- BEGIN_INCLUDE(google-calendar:delete-event) -->
     <google-calendar:delete-event>
-		<google-calendar:calendar-event/>    
+		<google-calendar:calendar-request/>    
     </google-calendar:delete-event>
 <!-- END_INCLUDE(google-calendar:delete-event) -->
 <!-- BEGIN_INCLUDE(google-calendar:clear-calendar) -->

@@ -27,6 +27,8 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.DateTime;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.calendar.CalendarScopes;
+import com.google.api.services.calendar.model.AclRule;
+import com.google.api.services.calendar.model.AclRule.Scope;
 import com.google.api.services.calendar.model.Calendar;
 import com.google.api.services.calendar.model.CalendarList;
 import com.google.api.services.calendar.model.CalendarListEntry;
@@ -71,9 +73,10 @@ public class CalendarManager {
 	}
 
 	/**
+	 * Creates a new event
 	 * 
 	 * @param calendarEvent
-	 * @return
+	 * @return an instance of CalendarResponse
 	 */
 	public CalendarResponse createEvent(CalendarEventRequest calendarEvent) {
 		CalendarResponse result = new CalendarResponse();
@@ -94,9 +97,10 @@ public class CalendarManager {
 	}
 
 	/**
+	 * Updates existing event as given or create new event and calendar if specified 
 	 * 
 	 * @param calendarEventRequest
-	 * @return
+	 * @return an instance of CalendarResponse
 	 */
 	public CalendarResponse updateEvent(CalendarRequest calendarRequest, boolean createIfNotFound) {
 		CalendarResponse result = new CalendarResponse();
@@ -124,7 +128,7 @@ public class CalendarManager {
 					result.setEventId(event.getId());
 					result.setSuccess(event != null);
 					if (result.isSuccess() && originalEvent != null) {
-						deleteEvent(calendarRequest.getCalendarEventRequest());
+						deleteEvent(calendarRequest);
 					}
 				} else {
 					result.setMessage("Could not getCalendar: " + calendarRequest.toString());
@@ -138,16 +142,40 @@ public class CalendarManager {
 		return result;
 	}
 
+	/**
+	 * Creates new calendar as given without checking for uniqueness (i.e. summary, description)
+	 * 
+	 * @param calendarRequest
+	 * @return an instance of CalendarResponse indication success, id, and messages as appropriate
+	 */
 	public CalendarResponse createCalendar(CalendarRequest calendarRequest) {
 		CalendarResponse result = new CalendarResponse();
 		try {			
 			Calendar entry = new Calendar();
-			entry.setSummary(calendarRequest.getSummary());
-			if (calendarRequest.getSummary() != null) {
+			if (calendarRequest.getDescription() != null) {
 				entry.setDescription(calendarRequest.getDescription());
 			}
 			entry = client.calendars().insert(entry).execute();			
 			result.setCalendarId(entry.getId());
+			result.setSuccess(setCalendarAccess(entry.getId()).isSuccess());
+			
+		} catch (IOException e) {
+			LOGGER.error(e);
+			result.setMessage(e.getMessage());
+		}
+		return result;
+	}
+	
+	private CalendarResponse setCalendarAccess(String calendarId) {
+		CalendarResponse result = new CalendarResponse();
+		AclRule rule = new AclRule();
+		Scope scope = new Scope();
+		scope.setType("scopeType");
+		scope.setValue("scopeValue");
+		rule.setScope(scope);
+		rule.setRole("role");
+		try {
+			client.acl().insert("primary", rule).execute();
 			result.setSuccess(true);
 		} catch (IOException e) {
 			LOGGER.error(e);
@@ -156,16 +184,30 @@ public class CalendarManager {
 		return result;
 	}
 	
+	/**
+	 * Updates an existing calendar optionally creating if not found
+	 * 
+	 * @param calendarRequest
+	 * @param createIfNotFound
+	 * @return an instance of CalendarResponse
+	 */
 	public CalendarResponse updateCalendar(CalendarRequest calendarRequest, boolean createIfNotFound) {
 		CalendarResponse result = new CalendarResponse();
 		CalendarRequest calendar = findCalendar(calendarRequest);
 		if (calendar != null) {
-			
+			calendarRequest.setId(calendar.getId());
+			result = _updateCalendar(calendarRequest);
+		} else if (createIfNotFound) {
+			result = createCalendar(calendarRequest);
 		}
 		return result;
 	}
 	
-	
+	/**
+	 * 
+	 * @param calendarRequest
+	 * @return
+	 */
 	public CalendarResponse _updateCalendar(CalendarRequest calendarRequest) {
 		
 		CalendarResponse response = new CalendarResponse();
@@ -199,6 +241,12 @@ public class CalendarManager {
 		return response;
 	}
 
+	/**
+	 * Deletes existing calendar by id
+	 * 
+	 * @param calendarId
+	 * @return an instance of Calendar response
+	 */
 	public CalendarResponse deleteCalendar(String calendarId) {
 		CalendarResponse result = new CalendarResponse();
 		try {
@@ -211,15 +259,14 @@ public class CalendarManager {
 		return result;
 	}
 
-	public CalendarResponse deleteEvent(CalendarEventRequest calendarEvent) {
+	public CalendarResponse deleteEvent(CalendarRequest calendarRequest) {
 		CalendarResponse result = new CalendarResponse();
 		try {
-			List<Event> events = getCalendarEvents(calendarEvent
-					.getCalendarId());
+			List<Event> events = getCalendarEvents(calendarRequest.getId());
 			for (Event event : events) {
-				if (calendarEvent.getEventId().equals(event.getId())) {
+				if (calendarRequest.getCalendarEventRequest().getEventId().equals(event.getId())) {
 					client.events()
-							.delete(calendarEvent.getCalendarId(),
+							.delete(calendarRequest.getId(),
 									event.getId()).execute();
 					result.setSuccess(true);
 					return result;

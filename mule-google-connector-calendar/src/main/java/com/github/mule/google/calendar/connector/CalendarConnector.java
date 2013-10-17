@@ -222,13 +222,13 @@ public class CalendarConnector {
 	 * 
 	 * {@sample.xml ../../../doc/Calendar-connector.xml.sample google-calendar:delete-event}
 	 * 
-	 * @param calendarEvent
-	 *            calendarEvent of calendar        
+	 * @param calendarRequest
+	 *            calendarRequest of calendar event        
 	 * @return boolean
 	 * */
 	@Processor
-	public CalendarResponse deleteEvent(CalendarEventRequest calendarEvent) {
+	public CalendarResponse deleteEvent(CalendarRequest calendarRequest) {
 		CalendarManager manager = new CalendarManager();
-		return manager.deleteEvent(calendarEvent);
+		return manager.deleteEvent(calendarRequest);
 	}
 }
