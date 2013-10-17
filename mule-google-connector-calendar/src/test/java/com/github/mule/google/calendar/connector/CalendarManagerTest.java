@@ -79,10 +79,15 @@ public class CalendarManagerTest {
 
 	@Test
 	public void testClearCalendar() {
+		// first we have to create a calendar in case none exist		
 		CalendarResponse result = new CalendarResponse();
 		CalendarManager calendarManager = new CalendarManager();
 		CalendarRequest calendarRequest = new CalendarRequest();
 		calendarRequest.setSummary(TEST_CALENDAR_NAME);
+		result = calendarManager.createCalendar(calendarRequest);
+		if (result.isSuccess()) {
+			calendarRequest.setId(result.getCalendarId());
+		}
 		CalendarRequest calendar = calendarManager.findCalendar(calendarRequest);
 		if (calendar != null)
 			result = calendarManager.clearCalendar(calendar.getId());

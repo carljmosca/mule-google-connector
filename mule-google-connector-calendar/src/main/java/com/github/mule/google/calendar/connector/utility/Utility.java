@@ -4,6 +4,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 public class Utility {
@@ -35,6 +36,10 @@ public class Utility {
 			
 		}
 		return result;
+	}
+	
+	public static boolean notEmptyEqualStrings(String value1, String value2) {
+		return StringUtils.isNotEmpty(value1) && StringUtils.isNotEmpty(value2) && value1.equals(value2);
 	}
 
 }

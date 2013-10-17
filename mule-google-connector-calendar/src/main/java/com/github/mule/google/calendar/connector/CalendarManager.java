@@ -103,11 +103,16 @@ public class CalendarManager {
 		Calendar calendar = null;
 		Event event = null;
 		try {
-			if (findCalendar(calendarRequest) == null) {
+			CalendarRequest existingCalendar = findCalendar(calendarRequest);
+			if (existingCalendar == null) {
 				CalendarResponse response = createCalendar(calendarRequest);
 				if (response.isSuccess()) {
 					calendarRequest.setId(response.getCalendarId());
+				} else {
+					LOGGER.debug(response.getMessage());
 				}
+			} else {
+				calendarRequest.setId(existingCalendar.getId());
 			}
 			Event originalEvent = getCalendarEvent(
 					calendarRequest.getId(), calendarRequest.getCalendarEventRequest().getEventId());
@@ -320,9 +325,7 @@ public class CalendarManager {
 								calendarListEntry.getSummary(),
 								calendarListEntry.getDescription()));
 					}					
-				} else if (calendarListEntry.getSummary().equals(calendarRequest.getSummary())
-						&& calendarListEntry.getDescription().equals(calendarRequest.getDescription())
-						) {
+				} else if (Utility.notEmptyEqualStrings(calendarListEntry.getDescription(), calendarRequest.getDescription())) {
 					list.add(new CalendarRequest(
 							calendarListEntry.getId(),
 							calendarListEntry.getSummary(),

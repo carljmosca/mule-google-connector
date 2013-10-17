@@ -20,7 +20,7 @@ public class CalendarEventRequest implements Serializable {
 	private java.util.Calendar start;
 	private java.util.Calendar end;
 	@Optional
-	private String location;
+	private String location = "";
 //	@Optional
 //	private List<Attendee> attendees;
 	
