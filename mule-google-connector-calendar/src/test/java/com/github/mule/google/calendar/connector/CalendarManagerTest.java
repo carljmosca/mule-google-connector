@@ -16,7 +16,8 @@ import com.github.mule.google.wrapper.CalendarResponse;
 
 public class CalendarManagerTest {
 
-	private final String TEST_CALENDAR_NAME = "Test Calendar";
+	//private final String TEST_CALENDAR_NAME = "Test Calendar";
+	private final String TEST_CALENDAR_NAME = "Carl Mosca";
 	private final String TEST_CALENDAR_DESCRIPTION = "really interesting description";
 	
 	@Test
@@ -74,6 +75,9 @@ public class CalendarManagerTest {
 		calendarRequest.getCalendarEventRequest().setStart(Calendar.getInstance());
 		calendarRequest.getCalendarEventRequest().setEnd(Calendar.getInstance());		
 		CalendarResponse response = calendarManager.updateEvent(calendarRequest, true);
+		if (response.isSuccess()) {
+			response = calendarManager.deleteEvent(calendarRequest);
+		}
 		assertTrue(response.isSuccess());
 	}
 

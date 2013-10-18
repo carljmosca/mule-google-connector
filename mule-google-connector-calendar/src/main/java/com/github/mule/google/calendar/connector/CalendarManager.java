@@ -164,8 +164,8 @@ public class CalendarManager {
 			}
 			entry = client.calendars().insert(entry).execute();			
 			result.setCalendarId(entry.getId());
-			result.setSuccess(true);
-			//result.setSuccess(setCalendarAccess(entry.getId()).isSuccess());			
+//			result.setSuccess(true);
+			result.setSuccess(setCalendarAccess(entry.getId()).isSuccess());			
 		} catch (IOException e) {
 			LOGGER.error(e);
 			result.setMessage(e.getMessage());
@@ -177,13 +177,13 @@ public class CalendarManager {
 		CalendarResponse result = new CalendarResponse();
 		AclRule rule = new AclRule();
 		Scope scope = new Scope();
-		scope.setType("scopeType");
-		scope.setValue("scopeValue");
+		scope.setType("default");
+		//scope.setValue("default");
 		rule.setScope(scope);
-		rule.setRole("role");
+		rule.setRole("reader");
 		try {
-			client.acl().insert("primary", rule).execute();
-			result.setSuccess(true);
+			AclRule createdRule = client.acl().insert("primary", rule).execute();
+			result.setSuccess(createdRule != null && !StringUtils.isEmpty(createdRule.getId()));
 		} catch (IOException e) {
 			LOGGER.error(e);
 			result.setMessage(e.getMessage());
@@ -268,19 +268,18 @@ public class CalendarManager {
 
 	public CalendarResponse deleteEvent(CalendarRequest calendarRequest) {
 		CalendarResponse result = new CalendarResponse();
-		try {
-			List<Event> events = findEvents(calendarRequest.getCalendarEventRequest());
-			for (Event event : events) {
-				if (calendarRequest.getCalendarEventRequest().getEventId().equals(event.getId())) {
-					client.events()
-							.delete(calendarRequest.getId(),
-									event.getId()).execute();
-					result.setSuccess(true);
-					return result;
-				}
+		List<Event> events = findEvents(calendarRequest.getCalendarEventRequest());
+		for (Event event : events) {
+			try {
+				client.events()
+				.delete(calendarRequest.getId(),
+						event.getId()).execute();
+				result.setSuccess(true);
+			} catch (IOException e) {
+				result.setSuccess(false);
+				result.setMessage(e.getMessage());
+				break;
 			}
-		} catch (IOException e) {
-			result.setMessage(e.getMessage());
 		}
 		return result;
 	}
@@ -404,32 +403,31 @@ public class CalendarManager {
 		List<Event> events = getCalendarEvents(calendarEvent.getCalendarId());
 		for (Event event : events) {
 			boolean found = false;
-			if (calendarEvent.getEventId() != null
-					&& calendarEvent.getEventId().length() > 0) {
+			if (!StringUtils.isEmpty(calendarEvent.getEventId())) {
 				found = event.getId().equals(calendarEvent.getEventId());
 				if (!found)
-					break;
+					continue;
 			}
-			if (calendarEvent.getSummary() != null
-					&& calendarEvent.getSummary().length() > 0) {
-				found = event.getSummary().indexOf(calendarEvent.getSummary()) >= 0;
+			if (!StringUtils.isEmpty(event.getSummary())) {
+				found = event.getSummary().equals(calendarEvent.getSummary());
 				if (!found)
-					break;
+					continue;
 			}
-			if (!found && calendarEvent.getDescription() != null
-					&& calendarEvent.getDescription().length() > 0) {
-				found = event.getDescription().indexOf(
-						calendarEvent.getDescription()) >= 0;
+			if (!StringUtils.isEmpty(event.getDescription())) {
+				found = event.getDescription().equals(calendarEvent.getDescription());
 				if (!found)
-					break;
+					continue;
 			}
-			if (calendarEvent.getStart() != null) {
-				found = Utility.compareDates(new Date(event.getStart()
+			found = Utility.compareDates(new Date(event.getStart()
 						.getDateTime().getValue()), calendarEvent.getStart()
 						.getTime(), dateFormat);
-				if (!found)
-					break;
-			}
+			if (!found)
+				continue;
+			found = Utility.compareDates(new Date(event.getEnd()
+					.getDateTime().getValue()), calendarEvent.getEnd()
+					.getTime(), dateFormat);
+			if (!found)
+				continue;
 			if (found) {
 				result.add(event);
 			}
