@@ -158,7 +158,11 @@ public class CalendarManager {
 		CalendarResponse result = new CalendarResponse();
 		try {			
 			Calendar entry = new Calendar();
-			entry.setSummary(calendarRequest.getSummary());
+			if (StringUtils.isEmpty(calendarRequest.getSummary())) {
+				entry.setSummary("New Calendar");
+			} else {
+				entry.setSummary(calendarRequest.getSummary());
+			}
 			if (calendarRequest.getDescription() != null) {
 				entry.setDescription(calendarRequest.getDescription());
 			}
