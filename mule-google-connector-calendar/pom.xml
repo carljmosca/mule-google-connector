@@ -3,12 +3,12 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.github</groupId>
-	<version>1.1-SNAPSHOT</version>
+	<version>1.1.1-SNAPSHOT</version>
 	<name>Mule Google Calendar Connector</name>
 
 	<properties>
-		<mule.version>3.4.0</mule.version>
-		<mule.devkit.version>3.4.0</mule.devkit.version>
+		<mule.version>3.4.1</mule.version>
+		<mule.devkit.version>3.4.1</mule.devkit.version>
 		<junit.version>4.9</junit.version>
 		<mockito.version>1.8.2</mockito.version>
 		<jdk.version>1.6</jdk.version>
