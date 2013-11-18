@@ -12,6 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.github.mule.google.calendar.connector.utility.Utility;
+import com.github.mule.google.wrapper.Attendee;
 import com.github.mule.google.wrapper.CalendarEventRequest;
 import com.github.mule.google.wrapper.CalendarRequest;
 import com.github.mule.google.wrapper.CalendarResponse;
@@ -33,6 +34,7 @@ import com.google.api.services.calendar.model.Calendar;
 import com.google.api.services.calendar.model.CalendarList;
 import com.google.api.services.calendar.model.CalendarListEntry;
 import com.google.api.services.calendar.model.Event;
+import com.google.api.services.calendar.model.EventAttendee;
 import com.google.api.services.calendar.model.EventDateTime;
 import com.google.api.services.calendar.model.Events;
 
@@ -162,7 +164,7 @@ public class CalendarManager {
 				entry.setSummary("New Calendar");
 			} else {
 				entry.setSummary(calendarRequest.getSummary());
-			}
+			}			
 			if (calendarRequest.getDescription() != null) {
 				entry.setDescription(calendarRequest.getDescription());
 			}
@@ -446,20 +448,20 @@ public class CalendarManager {
 		event.setDescription(calendarEvent.getDescription());
 		event.setLocation(calendarEvent.getLocation());
 		boolean sendNotificaitons = false;
-//		if (calendarEvent.getAttendees() != null
-//				&& !calendarEvent.getAttendees().isEmpty()) {
-//			List<EventAttendee> eventAttendees = new ArrayList<EventAttendee>(0);
-//			for (Attendee attendee : calendarEvent.getAttendees()) {
-//				EventAttendee ea = new EventAttendee();
-//				if (attendee.getEmail() != null)
-//					ea.setEmail(attendee.getEmail());
-//				if (attendee.getName() != null)
-//					ea.setDisplayName(attendee.getName());
-//				eventAttendees.add(ea);
-//				sendNotificaitons = true;
-//			}
-//			event.setAttendees(eventAttendees);
-//		}
+		if (calendarEvent.getAttendees() != null
+				&& !calendarEvent.getAttendees().isEmpty()) {
+			List<EventAttendee> eventAttendees = new ArrayList<EventAttendee>(0);
+			for (Attendee attendee : calendarEvent.getAttendees()) {
+				EventAttendee ea = new EventAttendee();
+				if (attendee.getEmail() != null)
+					ea.setEmail(attendee.getEmail());
+				if (attendee.getName() != null)
+					ea.setDisplayName(attendee.getName());
+				eventAttendees.add(ea);
+				sendNotificaitons = true;
+			}
+			event.setAttendees(eventAttendees);
+		}
 		Event result = client.events()
 				.insert(calendarEvent.getCalendarId(), event)
 				.setSendNotifications(sendNotificaitons).execute();

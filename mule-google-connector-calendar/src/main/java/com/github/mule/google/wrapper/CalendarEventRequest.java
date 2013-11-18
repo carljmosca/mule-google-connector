@@ -2,6 +2,7 @@ package com.github.mule.google.wrapper;
 
 import java.io.Serializable;
 import java.util.Calendar;
+import java.util.List;
 
 import org.mule.api.annotations.param.Optional;
 
@@ -21,8 +22,8 @@ public class CalendarEventRequest implements Serializable {
 	private java.util.Calendar end;
 	@Optional
 	private String location = "";
-//	@Optional
-//	private List<Attendee> attendees;
+	@Optional
+	private List<Attendee> attendees;
 	
 	public CalendarEventRequest() {
 	}
@@ -100,13 +101,13 @@ public class CalendarEventRequest implements Serializable {
 		this.location = location;
 	}
 
-//	public List<Attendee> getAttendees() {
-//		return attendees;
-//	}
-//
-//	public void setAttendees(List<Attendee> attendees) {
-//		this.attendees = attendees;
-//	}
+	public List<Attendee> getAttendees() {
+		return attendees;
+	}
+
+	public void setAttendees(List<Attendee> attendees) {
+		this.attendees = attendees;
+	}
 	
 	@Override
 	public String toString() {

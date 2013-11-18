@@ -10,14 +10,14 @@ import java.util.List;
 import org.junit.Test;
 
 import com.github.mule.google.calendar.connector.utility.Utility;
+import com.github.mule.google.wrapper.Attendee;
 import com.github.mule.google.wrapper.CalendarEventRequest;
 import com.github.mule.google.wrapper.CalendarRequest;
 import com.github.mule.google.wrapper.CalendarResponse;
 
 public class CalendarManagerTest {
 
-	//private final String TEST_CALENDAR_NAME = "Test Calendar";
-	private final String TEST_CALENDAR_NAME = "Carl Mosca";
+	private final String TEST_CALENDAR_NAME = "Test Calendar";
 	private final String TEST_CALENDAR_DESCRIPTION = "really interesting description";
 	
 	@Test
@@ -47,13 +47,13 @@ public class CalendarManagerTest {
 				calendarEvent.setStart(java.util.Calendar.getInstance());
 				calendarEvent.setEnd(java.util.Calendar.getInstance());
 				calendarEvent.getStart().setTime(
-						Utility.stringToDate("2013-9-13 11:00:00 AM"));
+						Utility.stringToDate("2013-11-19 11:00:00 AM"));
 				calendarEvent.getEnd().setTime(
-						Utility.stringToDate("2013-9-25 09:45AM"));
+						Utility.stringToDate("2013-11-19 11:30:00 AM"));
 				calendarEvent.setSummary("new item");
 				calendarEvent.setDescription("Test calendar item");
 				calendarEvent.setLocation("main conference room");
-				List<String> guestList = new ArrayList<String>(0);
+				calendarEvent.setAttendees(getAttendees());
 				result = calendarManager.createEvent(calendarEvent);
 			} finally {
 				calendarManager.deleteCalendar(calendarId);
@@ -61,6 +61,15 @@ public class CalendarManagerTest {
 			}
 		}
 		assertTrue(!result.isSuccess());
+	}
+	
+	private List<Attendee> getAttendees() {		
+		List<Attendee> attendees = new ArrayList<Attendee>(0);
+		Attendee attendee = new Attendee();
+		attendee.setName("Test Person");
+		attendee.setEmail("testperson@gee.male.com");
+		attendees.add(attendee);
+		return attendees;
 	}
 	
 	@Test
@@ -74,9 +83,14 @@ public class CalendarManagerTest {
 		calendarRequest.getCalendarEventRequest().setLocation("my location");
 		calendarRequest.getCalendarEventRequest().setStart(Calendar.getInstance());
 		calendarRequest.getCalendarEventRequest().setEnd(Calendar.getInstance());		
+		calendarRequest.getCalendarEventRequest().setAttendees(getAttendees());
 		CalendarResponse response = calendarManager.updateEvent(calendarRequest, true);
 		if (response.isSuccess()) {
-			response = calendarManager.deleteEvent(calendarRequest);
+			calendarRequest.getCalendarEventRequest().setSummary("second event");
+			calendarRequest.getCalendarEventRequest().setStart(Calendar.getInstance());
+			calendarRequest.getCalendarEventRequest().setEnd(Calendar.getInstance());
+			response = calendarManager.updateEvent(calendarRequest, true);
+			//response = calendarManager.deleteEvent(calendarRequest);
 		}
 		assertTrue(response.isSuccess());
 	}
