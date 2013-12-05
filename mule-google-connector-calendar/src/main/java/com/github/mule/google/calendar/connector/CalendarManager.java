@@ -274,17 +274,21 @@ public class CalendarManager {
 
 	public CalendarResponse deleteEvent(CalendarRequest calendarRequest) {
 		CalendarResponse result = new CalendarResponse();
-		List<Event> events = findEvents(calendarRequest.getCalendarEventRequest());
-		for (Event event : events) {
-			try {
-				client.events()
-				.delete(calendarRequest.getId(),
-						event.getId()).execute();
-				result.setSuccess(true);
-			} catch (IOException e) {
-				result.setSuccess(false);
-				result.setMessage(e.getMessage());
-				break;
+		List<CalendarRequest> calendarRequests = findCalendars(calendarRequest);
+		for (CalendarRequest request : calendarRequests) {
+			calendarRequest.setId(request.getId());
+			List<Event> events = findEvents(calendarRequest.getCalendarEventRequest());
+			for (Event event : events) {
+				try {
+					client.events()
+							.delete(calendarRequest.getId(), event.getId())
+							.execute();
+					result.setSuccess(true);
+				} catch (IOException e) {
+					result.setSuccess(false);
+					result.setMessage(e.getMessage());
+					break;
+				}
 			}
 		}
 		return result;
