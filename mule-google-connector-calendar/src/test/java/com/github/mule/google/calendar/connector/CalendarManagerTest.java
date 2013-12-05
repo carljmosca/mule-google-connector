@@ -90,8 +90,9 @@ public class CalendarManagerTest {
 			calendarRequest.getCalendarEventRequest().setStart(Calendar.getInstance());
 			calendarRequest.getCalendarEventRequest().setEnd(Calendar.getInstance());
 			response = calendarManager.updateEvent(calendarRequest, true);
-			//response = calendarManager.deleteEvent(calendarRequest);
 		}
+		calendarRequest.setId("");
+		response = calendarManager.deleteEvent(calendarRequest);
 		assertTrue(response.isSuccess());
 	}
 
