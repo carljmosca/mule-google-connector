@@ -414,17 +414,17 @@ public class CalendarManager {
 		for (Event event : events) {
 			boolean found = false;
 			if (!StringUtils.isEmpty(calendarEvent.getEventId())) {
-				found = event.getId().equals(calendarEvent.getEventId());
+				found = event.getId().indexOf(calendarEvent.getEventId()) >= 0;
 				if (!found)
 					continue;
 			}
 			if (!StringUtils.isEmpty(event.getSummary())) {
-				found = event.getSummary().equals(calendarEvent.getSummary());
+				found = event.getSummary().indexOf(calendarEvent.getSummary()) >= 0;
 				if (!found)
 					continue;
 			}
 			if (!StringUtils.isEmpty(event.getDescription())) {
-				found = event.getDescription().equals(calendarEvent.getDescription());
+				found = event.getDescription().indexOf(calendarEvent.getDescription()) >= 0;
 				if (!found)
 					continue;
 			}

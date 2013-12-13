@@ -30,6 +30,13 @@ CONFIGURATION
 
 The client_secrets.json file (download from Google after creating an OAuth2 Client ID for API Access) should be placed in USER_HOME/.store
 
+Go to the API Console: https://code.google.com/apis/console
+
+If no projects exist, click the Create Project button
+	
+Next, enable the Calendar API via APIs and Auth -> APIs -> Calendar API 
+
+
 ADDITIONAL RESOURCES
 ====================
 Everything you need to know about getting started with Mule can be found here:
